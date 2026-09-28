@@ -34,7 +34,9 @@ Postcard now shows up in your plugin list. Click **Add** on it and you are done.
 
 ### 2. Make a guide
 
-Open Claude Code in the folder where you want your trips saved and type `/postcard`. A page opens in your browser. Describe the trip and press **Generate guide**. When it is done, download the guide from the same page.
+Start a new Claude Code session and type `/postcard:postcard`. A page opens in your browser. Describe the trip, set the sliders if you like, and press **Generate guide**. When it is done, download the guide from the same page.
+
+Guides are saved in the folder Claude Code is open in. With no folder open, they go to a `Postcard` folder in your home folder.
 
 You need Python 3. Everything else installs itself.
 
@@ -49,3 +51,5 @@ You need Python 3. Everything else installs itself.
 **The guide is one file.** Photos and fonts are built in. It works offline and you can email it as it is.
 
 **Prefer chat?** Just tell Claude Code about the trip and it builds the guide without the form.
+
+**Getting updates.** Go to **Settings**, then **Plugins**, open Postcard and click **Update**. Start a new session afterwards.
