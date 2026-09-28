@@ -1,0 +1,86 @@
+/* Tabbed layout for trip guides (CSS only, no JavaScript).
+
+   Markup, as direct children of .page, in this order:
+     <div class="hero">...</div> <div class="route-strip">...</div>
+     <input type="radio" name="tab" class="tabradio" id="t-overview" checked>
+     <input type="radio" name="tab" class="tabradio" id="t-<stop>">   one per tab
+     <span id="top" class="tabs-anchor"></span>
+     <nav class="tabbar"><label for="t-overview" style="--c:var(--ink)">
+        <span class="tb-name">Overview</span><span class="tb-sub mono">Jul 17-Aug 1</span></label> ...</nav>
+     <div class="panels"><section class="panel" id="p-overview">...</section> ...</div>
+
+   Per tab, generate these two rules (the radios must stay siblings of .tabbar and .panels):
+     #t-X:checked ~ .panels #p-X{display:block}
+     #t-X:checked ~ .tabbar label[for=t-X]{background:var(--paper-raised);border-color:var(--c);box-shadow:inset 0 -3px 0 var(--c)}
+
+   "Next" button at the end of a panel (the link scrolls back to the tab bar,
+   the label switches tab):
+     <a class="p-next" href="#top"><label for="t-Y">Next: Y &rarr;</label></a>
+   Overview day rows are labels too: <label class="gl-row" for="t-X">...</label>
+   Add <meta name="viewport" content="width=device-width, initial-scale=1">.
+*/
+/* ===== tabbed layout ===== */
+.tabradio{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+.tabbar{position:sticky;top:0;z-index:40;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:6px;margin:22px -24px 0;padding:10px 24px;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);scroll-margin-top:0}
+.tabbar label{display:flex;flex-direction:column;gap:2px;padding:9px 12px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;min-width:0;transition:background .15s,border-color .15s}
+.tabbar label:hover{background:var(--paper-raised);border-color:var(--ink-faint)}
+.tb-name{font-weight:600;font-size:.9rem;display:flex;align-items:center;gap:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-dot{display:none}
+.tb-name::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+.tb-sub{font-size:.66rem;color:var(--ink-faint);letter-spacing:.04em;white-space:nowrap}
+@media (max-width:1000px){.tabbar{display:flex;overflow-x:auto;scrollbar-width:none}.tabbar label{flex:none}}
+.panels{padding-top:8px}
+.panel{display:none}
+.panel > .section:first-child,.panel > .logistics:first-child{margin-top:34px}
+.p-head{margin:34px 0 16px}
+.p-head .chapter-head{margin-bottom:4px}
+.p-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:12px}
+.p-meta .trip-badges{margin:0}
+.p-meta .maps-link{margin:0}
+.panel .smoke-note{margin:0 0 20px}
+.media-solo{margin-bottom:6px}
+.p-grid,.ov-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:34px;margin-top:34px;align-items:start}
+@media (max-width:980px){.p-grid,.ov-grid{grid-template-columns:minmax(0,1fr)}}
+.p-side{display:flex;flex-direction:column;gap:16px}
+.p-side .info-card + .info-card{margin-top:0}
+.blk{margin-top:46px}
+.blk-h{font-family:'Fraunces',serif;font-size:1.45rem;font-weight:600;letter-spacing:-.01em;margin:0 0 4px}
+.blk-sub{font-size:.86rem;color:var(--ink-soft);margin:0 0 14px;max-width:72ch}
+.p-main > .blk-h{margin-bottom:14px}
+.blk .hike-grid{margin-top:4px}
+.stay-box .stay-card{border:0;border-left:3px solid var(--line);border-radius:0;background:none;padding:2px 0 2px 12px;margin-top:12px;box-shadow:none}
+.stay-box .stay-card + .stay-card{margin-top:18px}
+.stay-box .stay-base{font-size:1rem}
+.stay-box{border-top:4px solid var(--must-see)}
+details.more{margin-top:46px;border:1px solid var(--line);border-radius:12px;background:var(--paper-raised)}
+details.more > summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:16px 20px;font-family:'Fraunces',serif;font-size:1.2rem;font-weight:600}
+details.more > summary::-webkit-details-marker{display:none}
+details.more > summary::after{content:"+";font-family:'IBM Plex Mono',monospace;font-size:1.2rem;color:var(--ink-faint);margin-left:auto}
+details.more[open] > summary::after{content:"\2212"}
+details.more > summary .more-n{font-size:.7rem;font-weight:400;color:var(--ink-faint);letter-spacing:.05em;font-family:'IBM Plex Mono',monospace}
+details.more .explore-more{margin:0;padding:0 20px 8px}
+details.more .fr-box{margin:8px 20px 20px}
+.p-next{display:block;margin:46px 0 0;text-align:right;text-decoration:none}
+.p-next label{display:inline-block;cursor:pointer;padding:12px 20px;border-radius:999px;border:1px solid var(--ink);color:var(--ink);font-weight:600;font-size:.92rem}
+.p-next label:hover{background:var(--ink);color:var(--paper)}
+/* overview glance */
+.glance{border:1px solid var(--line);border-radius:12px;background:var(--paper-raised);overflow:hidden}
+.gl-head,.gl-row{display:grid;grid-template-columns:76px 14px minmax(0,1fr) 110px;gap:12px;align-items:center;padding:9px 16px}
+.gl-head{font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}
+.gl-row{cursor:pointer;border-top:1px solid var(--line-soft);font-size:.9rem}
+.gl-head + .gl-row{border-top:0}
+.gl-row:hover{background:var(--paper)}
+.gl-d{font-size:.76rem;color:var(--ink-soft)}
+.gl-dot{width:10px;height:10px;border-radius:50%}
+.gl-sleep{font-size:.72rem;color:var(--ink-faint);text-align:right}
+@media (max-width:560px){.gl-head,.gl-row{grid-template-columns:62px 10px minmax(0,1fr);}.gl-sleep{display:none}}
+.todo-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:12px;counter-reset:t}
+.todo-list li{font-size:.86rem;color:var(--ink-soft);line-height:1.5}
+.todo-list li strong{color:var(--ink)}
+.todo-list .when{display:block;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--must-see);margin-bottom:1px}
+.todo{border-top:4px solid var(--ink)}
+.panel .legend-strip{margin-top:40px}
+.p-side .info-card > ul:not(.fest-list){margin:10px 0 0;padding-left:16px;display:flex;flex-direction:column;gap:9px}
+.p-side .info-card > ul:not(.fest-list) li{font-size:.84rem;line-height:1.5;color:var(--ink-soft)}
+.p-side .info-card > ul:not(.fest-list) li strong{color:var(--ink)}
+.tabs-anchor{display:block;height:0;scroll-margin-top:0}

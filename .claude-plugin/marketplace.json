@@ -1,0 +1,7 @@
+{
+  "name": "postcard",
+  "owner": { "name": "jedlwk" },
+  "plugins": [
+    { "name": "postcard", "source": "./", "description": "Describe a trip; get a photo-rich, tabbed HTML travel guide." }
+  ]
+}

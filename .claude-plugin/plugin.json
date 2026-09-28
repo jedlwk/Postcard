@@ -1,0 +1,7 @@
+{
+  "name": "postcard",
+  "version": "1.0.0",
+  "description": "Describe a trip in a browser form; Claude Code researches it and builds a photo-rich, tabbed HTML travel guide.",
+  "author": { "name": "jedlwk" },
+  "repository": "https://github.com/jedlwk/Postcard"
+}
