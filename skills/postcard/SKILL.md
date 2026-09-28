@@ -17,7 +17,7 @@ If the user hasn't described the trip in chat, use the form. `SKILL_DIR` below m
 2. `python3 "$SKILL_DIR/scripts/progress.py" wait` prints the brief as JSON. On `WAITING`, run it again.
 3. While building, report progress with `progress.py step <pct> "<stage>"`: 5 Planning the route, 15 Researching, 35 Finding photos, 50 Checking photos, 75 Building, 90 Verifying. Finish with `progress.py done <file>`, or `progress.py fail "<reason>"` if you can't finish. Run `serve.py stop` when the user is finished.
 
-The brief is open-ended: `trip` is the user's own description. Optional fields: `fly_in` / `fly_out` (date and rough time), `interests` (1 skip to 5 love, 3 is neutral), `pace` (1 very slow to 5 packed) and `attachments` (screenshot paths such as bookings; Read every one before planning). Decide stops, nights and order yourself, and state your assumptions in the Overview. Keep all work inside the output folder, because the plugin hook auto-approves only safe steps there.
+The brief's `brief_text` is a ready-made prompt built by the form: treat it as the user's instructions. The raw fields are there too: `trip` is the user's own description. Optional fields: `fly_in` / `fly_out` (date and rough time), `interests` (1 skip to 5 love, 3 is neutral), `style` (Pace, Early starts, Hiking, Driving, each 1 to 5; use them to size days, sunrise plans, hike picks and drive legs), `travellers` and `attachments` (screenshot paths such as bookings; Read every one before planning). Decide stops, nights and order yourself, and state your assumptions in the Overview. Keep all work inside the output folder, because the plugin hook auto-approves only safe steps there.
 
 ## 2. Research (before any HTML)
 
