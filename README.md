@@ -1,27 +1,51 @@
 # Postcard
 
-Describe a trip in plain words. Postcard turns it into a travel guide you can open anywhere: a tab for every stop, day-by-day plans, where to stay, hikes, festivals, weather, risks and logistics, with real photos and maps. It runs on your own Claude Code; no API key needed.
+Describe a trip in your own words and Postcard turns it into a travel guide. Every stop gets its own tab with day plans, where to stay and what is on. Real photos and maps are built in. It runs on your own Claude Code, so there is no API key to set up.
 
 ## Get started
 
-**1. Install.**
+### 1. Install
 
-- **Claude desktop app:** go to Settings → Plugins → **+ Add**, add the marketplace `jedlwk/Postcard` (or `https://github.com/jedlwk/Postcard`), then add **Postcard** from the list.
-- **Claude Code in a terminal:** type these into Claude Code (not your shell):
+In the Claude desktop app, go to **Settings** and open **Plugins**. Click **+ Add**.
 
-  ```
-  /plugin marketplace add jedlwk/Postcard
-  /plugin install postcard@postcard
-  ```
+![Settings, Plugins, then the + Add button](docs/1-plugins-add.png)
 
-**2. Make a guide.** Open Claude Code in the folder where you want your trips saved and type `/postcard`. A page opens in your browser: describe the trip, press **Generate guide**, and download it from the same page when it's done.
+Choose **Add marketplace**.
 
-That's it. You need Python 3; anything else installs itself.
+![Add marketplace in the + Add menu](docs/2-add-marketplace.png)
+
+Paste this in and confirm:
+
+```
+jedlwk/Postcard
+```
+
+Postcard now shows up in your plugin list. Click **Add** on it and you are done.
+
+**Using Claude Code in a terminal instead?** Type these into Claude Code, one at a time. They will not work in your normal shell.
+
+```
+/plugin marketplace add jedlwk/Postcard
+```
+
+```
+/plugin install postcard@postcard
+```
+
+### 2. Make a guide
+
+Open Claude Code in the folder where you want your trips saved and type `/postcard`. A page opens in your browser. Describe the trip and press **Generate guide**. When it is done, download the guide from the same page.
+
+You need Python 3. Everything else installs itself.
 
 ## Good to know
 
-- **It takes a while.** Usually 15 to 30 minutes, because it actually researches the trip. The page shows a live estimate. Keep Claude Code open until it finishes.
-- **Approvals.** With **Auto-approve safe steps** on, routine steps (web searches, reading pages, saving into your trips folder) run without asking. Anything else, or everything if you switch it off, appears as an Allow / Deny pop-up on the page. No answer in 5 minutes counts as Deny.
-- **Private by default.** The page runs only on your computer (127.0.0.1) with a one-time link. Postcard does nothing outside a build or outside your trips folder.
-- **The guide is one file.** Photos and fonts are built in, so it works offline and can be emailed or shared as is.
-- **Prefer chat?** Just tell Claude Code about the trip and it builds the guide without the form.
+**It takes a while.** Usually 15 to 30 minutes, because it actually researches the trip. The page shows a live estimate. Keep Claude Code open until it finishes.
+
+**Approvals.** With **Auto-approve safe steps** on, routine steps run without asking. These are web searches, reading pages and saving into your trips folder. Anything else shows up as an Allow or Deny pop-up on the same page. So does everything, if you switch the toggle off. No answer in 5 minutes counts as Deny.
+
+**It stays on your computer.** The page only runs on your own machine, with a one-time link. Postcard does nothing outside a build or outside your trips folder.
+
+**The guide is one file.** Photos and fonts are built in. It works offline and you can email it as it is.
+
+**Prefer chat?** Just tell Claude Code about the trip and it builds the guide without the form.
