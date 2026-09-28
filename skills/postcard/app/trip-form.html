@@ -222,7 +222,7 @@ body{background:var(--bg);font-family:"Inter var",Inter,-apple-system,BlinkMacSy
     </div>
     <div class="err hidden" id="err"></div>
   </div>
-  <p class="fine" id="estLine">This takes a while: roughly 30 to 90 minutes depending on the trip. You'll see a live estimate once it starts.</p>
+  <p class="fine" id="estLine">This takes a while: roughly 15 to 30 minutes depending on the trip. You'll see a live estimate once it starts.</p>
 </div>
 
 <!-- ===================== PROGRESS ===================== -->
@@ -247,7 +247,7 @@ body{background:var(--bg);font-family:"Inter var",Inter,-apple-system,BlinkMacSy
   <div id="pNotice"></div>
   <div id="pDone"></div>
   <ul class="log" id="pLog"></ul>
-  <p style="color:var(--faint);font-size:13px;margin-top:26px">Keep Claude Code open until this finishes. A full guide usually takes 30 to 90 minutes. You can close this tab and reopen it from the same link.</p>
+  <p style="color:var(--faint);font-size:13px;margin-top:26px">Keep Claude Code open until this finishes. A full guide usually takes 15 to 30 minutes. You can close this tab and reopen it from the same link.</p>
 </div>
 
 <!-- ===================== NO SERVER FALLBACK ===================== -->
@@ -290,7 +290,7 @@ function estimate(b) {
   if (b.start && b.end) days = Math.round((new Date(b.end) - new Date(b.start)) / 864e5);
   if (!days) { const m = b.trip.match(/(\d+)\s*(days?|nights?|d\b|n\b)/i); if (m) days = +m[1]; }
   if (!days) days = /fortnight/i.test(b.trip) ? 14 : /week\s*end|weekend/i.test(b.trip) ? 3 : /week/i.test(b.trip) ? 7 : 8;
-  return Math.max(25, Math.min(100, Math.round(20 + days * 4)));
+  return Math.max(15, Math.min(30, Math.round(12 + days * 1.2)));
 }
 function fail(msg) { const e = $('#err'); e.textContent = msg; e.classList.remove('hidden'); }
 
