@@ -68,6 +68,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self._token_ok(q):
             return self._send(403, {'error': 'token'})
         if u.path == '/api/state':
+            with open(ts.SEEN, 'w') as f:
+                f.write(str(ts.now()))
             return self._send(200, state())
         if u.path == '/api/download':
             st = ts.read(ts.STATUS, {}) or {}

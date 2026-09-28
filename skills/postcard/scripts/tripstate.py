@@ -10,6 +10,7 @@ SESSION = os.path.join(HOME, 'session.json')
 BRIEF = os.path.join(HOME, 'brief.json')
 STATUS = os.path.join(HOME, 'status.json')
 APPROVALS = os.path.join(HOME, 'approvals')
+SEEN = os.path.join(HOME, 'page_seen')   # touched each time the form polls
 
 
 def ensure():

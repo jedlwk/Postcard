@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.join(PLUGIN, 'skills', 'postcard', 'scripts'))
 import tripstate as ts
 
 WAIT = 300
+PAGE_FRESH = 20   # seconds; older than this means nobody is looking at the form
 READ_ONLY = {'ls', 'cat', 'head', 'tail', 'wc', 'grep', 'file', 'du', 'pwd', 'echo', 'cd', 'mkdir', 'sort', 'uniq', 'cut', 'which'}
 
 
@@ -33,6 +34,8 @@ def is_safe(tool, inp, sess):
         return inside(inp.get('file_path') or inp.get('notebook_path') or '', out)
     if tool == 'Bash':
         cmd = inp.get('command', '')
+        if re.fullmatch(r'\s*(open|xdg-open|start)\s+"?http://127\.0\.0\.1:\d+/[^"\s]*"?\s*', cmd):
+            return True               # opening our own form
         if re.search(r'\brm\b|\bsudo\b|\bcurl\b.*\|\s*(sh|bash)|>\s*/(?!dev/null)', cmd):
             return False
         for seg in re.split(r'&&|\|\||;|\|', cmd):
@@ -84,6 +87,12 @@ def main():
     kind = tool if safe and tool in ('WebSearch', 'WebFetch', 'Write', 'Edit', 'Read') else ''
     if safe and (sess.get('auto_approve', True) or kind in sess.get('always_kinds', [])):
         return decide('allow', 'Approved by the trip form')
+    try:
+        seen = float(open(ts.SEEN).read())
+    except (OSError, ValueError):
+        seen = 0
+    if ts.now() - seen > PAGE_FRESH:
+        return 0                      # form not open: let Claude Code ask as usual
     rid = uuid.uuid4().hex[:12]
     title, detail = describe(tool, inp)
     req = os.path.join(ts.APPROVALS, rid + '.req.json')
