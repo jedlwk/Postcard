@@ -6,14 +6,14 @@ description: Build a photo-rich, self-contained, tabbed HTML trip guide (a tab p
 # Trip guide builder
 
 Output is one HTML file: fonts and photos embedded as base64, no external
-requests, no JavaScript (CSS-only tabs). Save it as `<trip>/<trip>.html`, one
+requests, no JavaScript (CSS-only tabs). Save it as `<save folder>/<trip>/<trip>.html`, one
 folder per trip.
 
 ## 1. Get the brief
 
 If the user hasn't described the trip in chat, use the form. `SKILL_DIR` below means this file's folder. Write it out as the full path in each command.
 
-1. `python3 "$SKILL_DIR/scripts/serve.py" start --out "$PWD"` (Bash, `run_in_background: true`). Open the printed `TRIP_FORM_URL` (`open` / `xdg-open` / `start`).
+1. `python3 "SKILL_DIR/scripts/serve.py" start` as a normal (foreground) Bash call. It returns at once, opens the form in the browser, and prints the link and the save folder. Show the user the link as a clickable URL in case the browser didn't open. Guides save in the current folder, or `~/Postcard` if Claude has no folder open.
 2. `python3 "$SKILL_DIR/scripts/progress.py" wait` prints the brief as JSON. On `WAITING`, run it again.
 3. While building, report progress with `progress.py step <pct> "<stage>"`: 5 Planning the route, 15 Researching, 35 Finding photos, 50 Checking photos, 75 Building, 90 Verifying. Finish with `progress.py done <file>`, or `progress.py fail "<reason>"` if you can't finish. Run `serve.py stop` when the user is finished.
 

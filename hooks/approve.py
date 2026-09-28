@@ -85,7 +85,8 @@ def main():
     except ValueError:
         return 0
     sess = ts.active_session()
-    if not sess or not inside(ev.get('cwd', ''), sess['out_root']):
+    cwd = ev.get('cwd', '')
+    if not sess or not (inside(cwd, sess['out_root']) or inside(cwd, sess.get('claude_cwd', sess['out_root']))):
         return 0                      # not a form build: stay out of the way
     tool, inp = ev.get('tool_name', ''), ev.get('tool_input') or {}
     safe = is_safe(tool, inp, sess)

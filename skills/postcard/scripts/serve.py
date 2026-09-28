@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Local server for the trip form. Stdlib only.
 
-    python3 serve.py start --out <folder where trip folders go>   (run in background)
+    python3 serve.py start [--out <folder for trips>]   opens the form, returns at once
     python3 serve.py stop
 
 It serves app/trip-form.html, takes the brief, reports Claude's progress,
@@ -9,7 +9,7 @@ relays approval requests from the hook, and serves the finished file.
 Binds to 127.0.0.1 only, checks the Host header, and every API call needs
 the per-session token that is only in the URL Claude opens.
 """
-import argparse, json, os, secrets, shutil, signal, socket, sys, time
+import argparse, json, os, secrets, shutil, signal, socket, subprocess, sys, time
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
@@ -173,26 +173,59 @@ def ensure_pillow():
     print('Could not install Pillow automatically. Run: python3 -m pip install pillow', flush=True)
 
 
-def start(out):
+def default_out(cwd):
+    """Save next to the user's work, unless Claude was started with no real folder."""
+    c = os.path.realpath(cwd)
+    if 'scratch-workspaces' in c or c.startswith(('/tmp', '/private/tmp', '/var/folders')) or c == os.path.expanduser('~'):
+        return os.path.expanduser('~/Postcard')
+    return c
+
+
+def launch(out):
+    """Start the server detached, open the form, print the link, return at once."""
     ts.ensure()
     ensure_pillow()
     old = ts.active_session()
     if old:
-        print(f'Already running: http://127.0.0.1:{old["port"]}/#t={old["token"]}')
-        return
+        url = f'http://127.0.0.1:{old["port"]}/#t={old["token"]}'
+    else:
+        os.makedirs(out, exist_ok=True)
+        log = open(os.path.join(ts.HOME, 'server.log'), 'w')
+        subprocess.Popen([sys.executable, os.path.abspath(__file__), 'serve', '--out', out, '--cwd', os.getcwd()],
+                         stdout=log, stderr=log, stdin=subprocess.DEVNULL, start_new_session=True)
+        url = None
+        for _ in range(100):
+            time.sleep(0.1)
+            s = ts.active_session()
+            if s and s.get('started', 0) > time.time() - 30:
+                url = f'http://127.0.0.1:{s["port"]}/#t={s["token"]}'
+                break
+        if not url:
+            sys.exit('The form server did not start. See ~/.postcard/server.log')
+    try:
+        import webbrowser
+        webbrowser.open(url)
+    except Exception:
+        pass
+    print(f'Form opened in your browser. If it did not appear, open: {url}')
+    print(f'Guides will be saved in: {out}')
+
+
+def serve(out, cwd):
+    ts.ensure()
     shutil.rmtree(os.path.join(ts.HOME, 'attachments'), ignore_errors=True)
-    for p in (ts.BRIEF, ts.STATUS):
+    for p in (ts.BRIEF, ts.STATUS, ts.SEEN):
         if os.path.exists(p):
             os.remove(p)
     shutil.rmtree(ts.APPROVALS, ignore_errors=True); ts.ensure()
     port = free_port()
     sess = {'port': port, 'token': secrets.token_urlsafe(18), 'pid': os.getpid(), 'active': True,
-            'auto_approve': True, 'out_root': os.path.realpath(out),
+            'auto_approve': True, 'out_root': os.path.realpath(out), 'claude_cwd': os.path.realpath(cwd),
             'skill_root': os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'started': ts.now()}
-    ts.write(ts.SESSION, sess)
     srv = ThreadingHTTPServer(('127.0.0.1', port), Handler)
     srv.session = sess
     srv.timeout = 1
+    ts.write(ts.SESSION, sess)
 
     def shutdown(*_):
         sess['active'] = False
@@ -200,7 +233,6 @@ def start(out):
         sys.exit(0)
     signal.signal(signal.SIGTERM, shutdown)
     signal.signal(signal.SIGINT, shutdown)
-    print(f'TRIP_FORM_URL=http://127.0.0.1:{port}/#t={sess["token"]}', flush=True)
     while ts.now() - sess['started'] < MAX_LIFE:
         srv.handle_request()
     shutdown()
@@ -218,12 +250,16 @@ def stop():
 if __name__ == '__main__':
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
-    a = sub.add_parser('start'); a.add_argument('--out', default=os.getcwd())
+    a = sub.add_parser('start', help='open the form (returns immediately)')
+    a.add_argument('--out', help='folder for trip guides (default: current folder, or ~/Postcard)')
+    b = sub.add_parser('serve', help=argparse.SUPPRESS); b.add_argument('--out', required=True); b.add_argument('--cwd', required=True)
     sub.add_parser('stop')
     sub.add_parser('url')
     args = ap.parse_args()
     if args.cmd == 'start':
-        start(args.out)
+        launch(os.path.realpath(os.path.expanduser(args.out)) if args.out else default_out(os.getcwd()))
+    elif args.cmd == 'serve':
+        serve(args.out, args.cwd)
     elif args.cmd == 'stop':
         stop()
     else:
