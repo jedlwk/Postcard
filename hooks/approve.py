@@ -38,11 +38,16 @@ def is_safe(tool, inp, sess):
             return True               # opening our own form
         if re.search(r'\brm\b|\bsudo\b|\bcurl\b.*\|\s*(sh|bash)|>\s*/(?!dev/null)', cmd):
             return False
+        env = {}
         for seg in re.split(r'&&|\|\||;|\|', cmd):
             try:
                 words = shlex.split(seg)
             except ValueError:
                 return False
+            while words and re.fullmatch(r'[A-Za-z_]\w*=.*', words[0]):   # VAR=value prefixes
+                k, v = words.pop(0).split('=', 1)
+                env[k] = v
+            words = [re.sub(r'\$\{?(\w+)\}?', lambda m: env.get(m.group(1), m.group(0)), x) for x in words]
             if not words:
                 continue
             w = words[0]

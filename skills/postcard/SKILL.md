@@ -11,7 +11,7 @@ folder per trip.
 
 ## 1. Get the brief
 
-If the user hasn't described the trip in chat, use the form. `SKILL_DIR` is this file's folder.
+If the user hasn't described the trip in chat, use the form. `SKILL_DIR` below means this file's folder. Write it out as the full path in each command.
 
 1. `python3 "$SKILL_DIR/scripts/serve.py" start --out "$PWD"` (Bash, `run_in_background: true`). Open the printed `TRIP_FORM_URL` (`open` / `xdg-open` / `start`).
 2. `python3 "$SKILL_DIR/scripts/progress.py" wait` prints the brief as JSON. On `WAITING`, run it again.
