@@ -53,7 +53,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def _body(self):
         n = int(self.headers.get('Content-Length') or 0)
-        if n > 2_000_000:
+        if n > 40_000_000:
             raise ValueError('too large')
         return json.loads(self.rfile.read(n) or b'{}')
 
@@ -100,6 +100,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == '/api/brief':
             if ts.read(ts.BRIEF):
                 return self._send(409, {'error': 'A brief was already sent for this session.'})
+            body['attachments'] = save_attachments(body.get('attachments') or [])
             body['received_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
             ts.write(ts.BRIEF, body)
             ts.write(ts.STATUS, {'pct': 2, 'stage': 'Brief received. Waiting for Claude Code to start.',
@@ -120,6 +121,22 @@ class Handler(BaseHTTPRequestHandler):
             ts.write(os.path.join(ts.APPROVALS, rid + '.res.json'), {'allow': bool(body.get('allow'))})
             return self._send(200, {'ok': True})
         return self._send(404, {'error': 'no route'})
+
+
+def save_attachments(items):
+    """Screenshots arrive as data URLs; write them out so Claude can Read them."""
+    import base64, re
+    folder = os.path.join(ts.HOME, 'attachments'); os.makedirs(folder, exist_ok=True)
+    paths = []
+    for i, it in enumerate(items[:8], 1):
+        m = re.match(r'data:image/(png|jpe?g|webp|gif);base64,(.+)', str((it or {}).get('data', '')), re.S)
+        if not m:
+            continue
+        path = os.path.join(folder, f'screenshot-{i}.{m.group(1).replace("jpeg", "jpg")}')
+        with open(path, 'wb') as f:
+            f.write(base64.b64decode(m.group(2)))
+        paths.append(path)
+    return paths
 
 
 def state():
@@ -163,6 +180,7 @@ def start(out):
     if old:
         print(f'Already running: http://127.0.0.1:{old["port"]}/#t={old["token"]}')
         return
+    shutil.rmtree(os.path.join(ts.HOME, 'attachments'), ignore_errors=True)
     for p in (ts.BRIEF, ts.STATUS):
         if os.path.exists(p):
             os.remove(p)

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Postcard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%20aria-hidden%3D%22true%22%3E%3Cg%20transform%3D%22rotate%28-8%2024%2024%29%22%3E%3Crect%20x%3D%227%22%20y%3D%229%22%20width%3D%2234%22%20height%3D%2230%22%20rx%3D%223%22%20fill%3D%22%23fbfaf6%22%20stroke%3D%22%2315140f%22%20stroke-width%3D%222.2%22%20stroke-dasharray%3D%220.01%204.4%22%20stroke-linecap%3D%22round%22/%3E%3Crect%20x%3D%2211%22%20y%3D%2213%22%20width%3D%2226%22%20height%3D%2222%22%20rx%3D%222%22%20fill%3D%22%231f5d4f%22/%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2219.5%22%20r%3D%223.2%22%20fill%3D%22%23f3c9a0%22/%3E%3Cpath%20d%3D%22M11%2032l7-8%205%205%204-4%2010%209v1H11z%22%20fill%3D%22%23fff%22%20opacity%3D%22.92%22/%3E%3C/g%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#f6f5f1; --card:#ffffff; --ink:#18181a; --soft:#5c5c63; --faint:#9a9aa1;
@@ -197,30 +198,101 @@ body{background:var(--bg);font-family:"Inter var",Inter,-apple-system,BlinkMacSy
 @media (prefers-color-scheme:dark){.btn.accent{color:#0e0e10}}
 .sheet .fine{text-align:center;margin:10px 0 0}
 </style>
+<style id="v5">
+:root{--card-solid:#fbfaf6}
+@media (prefers-color-scheme:dark){:root{--card-solid:#1c1c20}}
+.one{max-width:1120px;justify-content:center}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:22px;color:var(--ink)}
+.brand .mark{width:40px;height:40px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.12))}
+.brand span{font-family:"Iowan Old Style","New York",ui-serif,Georgia,serif;font-size:22px;letter-spacing:-.01em;font-weight:500}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:stretch}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.card.solo{position:relative;display:flex;flex-direction:column}
+.card.solo textarea{flex:1;min-height:150px}
+.flights{display:flex;flex-wrap:wrap;gap:8px;padding:0 12px}
+.fl{display:flex;align-items:center;background:var(--line2);border-radius:99px;padding:0 6px 0 14px;flex:1;min-width:250px}
+.fl:focus-within{background:var(--accent-soft)}
+.fl-k{font-size:12px;color:var(--faint);font-weight:600;letter-spacing:.02em;margin-right:4px;white-space:nowrap}
+.fl:focus-within .fl-k{color:var(--accent)}
+.fl input{background:none!important;border:0!important;box-shadow:none!important;padding:9px 6px;font-size:13.5px;width:auto;min-width:0;color:var(--ink)}
+.fl input[type=date]{flex:1}
+.fl input[type=time]{width:118px;border-left:1px solid var(--line)!important;border-radius:0;padding-left:10px}
+.attach-row{display:flex;align-items:center;gap:12px;padding:12px 12px 0;flex-wrap:wrap}
+.attach{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:560;color:var(--ink);border:1px dashed var(--faint);border-radius:99px;padding:7px 14px;cursor:pointer;transition:all .15s}
+.attach:hover{border-color:var(--accent);color:var(--accent)}
+.attach svg{width:16px;height:16px}
+.attach-hint{font-size:12.5px;color:var(--faint)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 12px}
+.thumbs:empty{display:none}
+.thumbs figure{position:relative;margin:0;width:74px;height:56px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.thumbs button{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:1;cursor:pointer}
+.drop-veil{position:absolute;inset:0;border-radius:26px;border:2px dashed var(--accent);background:color-mix(in srgb,var(--accent-soft) 85%,transparent);display:none;place-items:center;font-weight:600;color:var(--accent);font-size:16px;pointer-events:none}
+.card.solo.dragging .drop-veil{display:grid}
+.card.side{background:var(--card);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid var(--line);border-radius:26px;padding:20px 20px 22px;box-shadow:0 30px 60px -30px rgba(40,30,10,.25)}
+.side-h{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:12px}
+.pace-h{margin-top:20px;padding-top:16px;border-top:1px solid var(--line2)}
+.lv{display:block;margin-bottom:12px;cursor:pointer}
+.lv-top{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;margin-bottom:5px}
+.lv-k{color:var(--ink);font-weight:520}
+.lv-v{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums;transition:color .15s}
+.lv[data-level="4"] .lv-v,.lv[data-level="5"] .lv-v{color:var(--accent);font-weight:600}
+.lv[data-level="1"] .lv-v{color:var(--bad)}
+.lv input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:none;padding:0;border:0;margin:0;cursor:pointer;
+  --track:linear-gradient(90deg,var(--accent) 0 var(--p),var(--line) var(--p) 100%)}
+.lv input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:var(--track)}
+.lv input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:var(--track)}
+.lv input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-6px;border-radius:50%;background:var(--card-solid);border:2px solid var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.18);transition:transform .12s}
+.lv input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--card-solid);border:2px solid var(--accent)}
+.lv input[type=range]:active::-webkit-slider-thumb{transform:scale(1.15)}
+.lv[data-level="1"] input{--track:linear-gradient(90deg,var(--bad) 0 var(--p),var(--line) var(--p) 100%)}
+.lv[data-level="1"] input::-webkit-slider-thumb{border-color:var(--bad)}
+.btn:disabled{opacity:.6;cursor:wait}
+@media (prefers-color-scheme:dark){.brand .mark path{opacity:.85}}
+.lv{display:grid;grid-template-columns:76px minmax(0,1fr) 62px;align-items:center;gap:10px;margin:0 0 6px}
+.lv-k{font-size:13.5px}
+.lv-v{text-align:right}
+.card.side{padding:18px 18px 16px}
+.pace-h{margin-top:14px;padding-top:14px}
+.layout{align-items:start}
+.card.solo textarea{flex:none;min-height:170px}
+</style>
 </head>
 <body>
 <div class="aura" aria-hidden="true"><i></i><i></i><i></i></div><div class="grain" aria-hidden="true"></div>
 
 <!-- ===================== FORM ===================== -->
 <div class="wrap one" id="formView">
-  <div class="eyebrow">Postcard</div>
+  <div class="brand"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><g transform="rotate(-8 24 24)"><rect x="7" y="9" width="34" height="30" rx="3" fill="var(--card-solid)" stroke="currentColor" stroke-width="2.2" stroke-dasharray="0.01 4.4" stroke-linecap="round"/><rect x="11" y="13" width="26" height="22" rx="2" fill="var(--accent)"/><circle cx="30" cy="19.5" r="3.2" fill="#f3c9a0"/><path d="M11 32l7-8 5 5 4-4 10 9v1H11z" fill="#fff" opacity=".92"/></g></svg><span>Postcard</span></div>
   <h1 class="big">Where to <em>next?</em></h1>
   <p class="lead">Describe it however you like. Claude Code fills the gaps and turns it into a photo guide: day plans, weather, festivals, logistics.</p>
-  <div class="card solo">
-    <textarea id="trip" rows="8" placeholder="e.g. 10 days in Japan in early April, two of us from Singapore.&#10;Tokyo, then Kyoto and a night in Nara. Flights booked: SQ12 lands Narita 1 Apr 07:30.&#10;Love food and markets, want cherry blossom, skip museums, not too rushed."></textarea>
-    <div class="row3">
-      <label class="f">From<input type="date" id="start"></label>
-      <label class="f">To<input type="date" id="end"></label>
-      <label class="f">Flying from<input type="text" id="home" placeholder="City"></label>
+  <div class="layout">
+    <div class="card solo" id="dropZone">
+      <textarea id="trip" rows="7" placeholder="e.g. 10 days in Japan in early April, two of us.&#10;Tokyo, then Kyoto and a night in Nara.&#10;Want cherry blossom, not too rushed."></textarea>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="flights">
+        <div class="fl"><span class="fl-k">Fly in</span><input type="date" id="inDate" aria-label="Fly in date"><input type="time" id="inTime" step="900" aria-label="Approximate arrival time"></div>
+        <div class="fl"><span class="fl-k">Fly out</span><input type="date" id="outDate" aria-label="Fly out date"><input type="time" id="outTime" step="900" aria-label="Approximate departure time"></div>
+      </div>
+      <div class="attach-row">
+        <label class="attach"><input type="file" id="files" accept="image/*" multiple hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.5l-8.3 8.3a5 5 0 01-7.1-7.1l8.5-8.5a3.3 3.3 0 014.7 4.7l-8.5 8.5a1.7 1.7 0 01-2.4-2.4l7.8-7.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Add screenshots</label>
+        <span class="attach-hint">Bookings, itineraries, saved posts. Drop, paste or pick.</span>
+      </div>
+      <div class="foot">
+        <label class="toggle" title="Web searches, reading web pages, photo downloads, and saving into this trip's folder. Anything else still asks on this page.">
+          <input type="checkbox" id="auto" checked><span class="sw"></span><span>Auto-approve safe steps</span>
+        </label>
+        <button class="btn" id="go">Generate guide</button>
+      </div>
+      <div class="err hidden" id="err"></div>
+      <div class="drop-veil">Drop screenshots here</div>
     </div>
-    <div class="chips" id="chips"></div>
-    <div class="foot">
-      <label class="toggle" title="Web searches, reading web pages, photo downloads, and saving into this trip's folder. Anything else still asks on this page.">
-        <input type="checkbox" id="auto" checked><span class="sw"></span><span>Auto-approve safe steps</span>
-      </label>
-      <button class="btn" id="go">Generate guide</button>
-    </div>
-    <div class="err hidden" id="err"></div>
+    <aside class="card side" aria-label="What you're into">
+      <div class="side-h">What you're into</div>
+      <div id="levers"></div>
+      <div class="side-h pace-h">Pace</div>
+      <div id="pace"></div>
+    </aside>
   </div>
   <p class="fine" id="estLine">This takes a while: roughly 15 to 30 minutes depending on the trip. You'll see a live estimate once it starts.</p>
 </div>
@@ -264,30 +336,76 @@ const $ = s => document.querySelector(s);
 const token = new URLSearchParams(location.hash.slice(1)).get('t') || '';
 const connected = location.protocol.startsWith('http') && token;
 const api = (path, body) => fetch(path, {method: body ? 'POST' : 'GET', headers: {'X-Token': token, 'Content-Type': 'application/json'}, body: body ? JSON.stringify(body) : undefined}).then(r => r.json().then(j => (r.ok ? j : Promise.reject(j))));
-const DRAFT = 'trip-form-draft-v2';
-const CHIPS = ['Nature', 'Food', 'Markets', 'Festivals', 'Nightlife', 'Culture', 'Relaxed pace', 'Packed days', 'Road trip'];
-CHIPS.forEach(k => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = k; b.dataset.k = k;
-  b.onclick = () => { b.classList.toggle('on'); save(); }; $('#chips').append(b); });
+const DRAFT = 'postcard-draft-v3';
+const INTERESTS = ['Nature', 'Food', 'Markets', 'Festivals', 'Nightlife', 'Culture', 'Museums', 'Shopping'];
+const LEVEL = ['', 'Skip', 'Less', 'Some', 'More', 'Love'];
+const PACE = ['', 'Very slow', 'Relaxed', 'Balanced', 'Full', 'Packed'];
+function lever(host, key, words) {
+  const row = document.createElement('label'); row.className = 'lv';
+  row.innerHTML = `<span class="lv-k">${key}</span><input type="range" min="1" max="5" step="1" value="3" data-k="${key}"><span class="lv-v"></span>`;
+  const r = row.querySelector('input'), v = row.querySelector('.lv-v');
+  const paint = () => { v.textContent = words[r.value]; r.style.setProperty('--p', ((r.value - 1) / 4 * 100) + '%'); row.dataset.level = r.value; };
+  r.addEventListener('input', () => { paint(); save(); }); paint(); host.append(row); return r;
+}
+const levers = INTERESTS.map(k => lever($('#levers'), k, LEVEL));
+const pace = lever($('#pace'), 'Days', PACE);
 
+/* ---------- screenshots ---------- */
+let shots = [];   // {name, data}
+const MAX_SHOTS = 8;
+function shrink(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => { const s = Math.min(1, 1600 / Math.max(img.width, img.height)); const c = document.createElement('canvas');
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res({name: file.name || 'screenshot.png', data: c.toDataURL('image/jpeg', 0.85)}); };
+    img.onerror = rej; img.src = url;
+  });
+}
+async function addFiles(list) {
+  for (const f of [...list].filter(f => f.type.startsWith('image/'))) {
+    if (shots.length >= MAX_SHOTS) { fail(`Up to ${MAX_SHOTS} screenshots.`); break; }
+    try { shots.push(await shrink(f)); } catch (e) {}
+  }
+  drawThumbs();
+}
+function drawThumbs() {
+  $('#thumbs').innerHTML = shots.map((s, i) => `<figure><img src="${s.data}" alt=""><button type="button" data-i="${i}" aria-label="Remove">×</button></figure>`).join('');
+  $('#thumbs').querySelectorAll('button').forEach(b => b.onclick = () => { shots.splice(+b.dataset.i, 1); drawThumbs(); });
+}
+$('#files').onchange = e => { addFiles(e.target.files); e.target.value = ''; };
+document.addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])]; if (f.length) { e.preventDefault(); addFiles(f); } });
+const dz = $('#dropZone');
+['dragenter', 'dragover'].forEach(t => dz.addEventListener(t, e => { e.preventDefault(); dz.classList.add('dragging'); }));
+['dragleave', 'drop'].forEach(t => dz.addEventListener(t, e => { e.preventDefault(); if (t === 'drop' || !dz.contains(e.relatedTarget)) dz.classList.remove('dragging'); }));
+dz.addEventListener('drop', e => addFiles(e.dataTransfer.files));
+
+/* ---------- collect / draft ---------- */
 function collect() {
-  return {trip: $('#trip').value.trim(), start: $('#start').value, end: $('#end').value, home: $('#home').value.trim(),
-          lean_towards: [...document.querySelectorAll('.chip.on')].map(c => c.dataset.k)};
+  return {trip: $('#trip').value.trim(),
+          fly_in: {date: $('#inDate').value, time: $('#inTime').value}, fly_out: {date: $('#outDate').value, time: $('#outTime').value},
+          interests: Object.fromEntries(levers.map(r => [r.dataset.k, +r.value])), pace: +pace.value};
 }
 function save() { try { localStorage.setItem(DRAFT, JSON.stringify(collect())); } catch (e) {} }
 function load() {
   let d = null; try { d = JSON.parse(localStorage.getItem(DRAFT)); } catch (e) {}
   if (!d) return;
-  $('#trip').value = d.trip || ''; $('#start').value = d.start || ''; $('#end').value = d.end || ''; $('#home').value = d.home || '';
-  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', (d.lean_towards || []).includes(c.dataset.k)));
+  $('#trip').value = d.trip || '';
+  $('#inDate').value = d.fly_in?.date || ''; $('#inTime').value = d.fly_in?.time || ''; $('#outDate').value = d.fly_out?.date || ''; $('#outTime').value = d.fly_out?.time || '';
+  levers.forEach(r => { if (d.interests?.[r.dataset.k]) { r.value = d.interests[r.dataset.k]; r.dispatchEvent(new Event('input')); } });
+  if (d.pace) { pace.value = d.pace; pace.dispatchEvent(new Event('input')); }
 }
 document.addEventListener('input', save);
 function asText(b) {
-  return [b.trip, (b.start || b.end) && `Dates: ${b.start || '?'} to ${b.end || '?'}`, b.home && `Flying from: ${b.home}`,
-          b.lean_towards.length && `Lean towards: ${b.lean_towards.join(', ')}`].filter(Boolean).join('\n');
+  const f = (x) => [x.date, x.time && 'around ' + x.time].filter(Boolean).join(' ');
+  const w = Object.entries(b.interests).filter(([, v]) => v !== 3).map(([k, v]) => `${k} ${LEVEL[v].toLowerCase()} (${v}/5)`);
+  return [b.trip, f(b.fly_in) && `Fly in: ${f(b.fly_in)}`, f(b.fly_out) && `Fly out: ${f(b.fly_out)}`,
+          w.length && `Interests: ${w.join(', ')}. Everything else balanced.`, `Pace: ${PACE[b.pace].toLowerCase()} (${b.pace}/5)`,
+          b.attachments?.length && `${b.attachments.length} screenshot(s) attached.`].filter(Boolean).join('\n');
 }
 function estimate(b) {
   let days = 0;
-  if (b.start && b.end) days = Math.round((new Date(b.end) - new Date(b.start)) / 864e5);
+  if (b.fly_in.date && b.fly_out.date) days = Math.round((new Date(b.fly_out.date) - new Date(b.fly_in.date)) / 864e5);
   if (!days) { const m = b.trip.match(/(\d+)\s*(days?|nights?|d\b|n\b)/i); if (m) days = +m[1]; }
   if (!days) days = /fortnight/i.test(b.trip) ? 14 : /week\s*end|weekend/i.test(b.trip) ? 3 : /week/i.test(b.trip) ? 7 : 8;
   return Math.max(15, Math.min(30, Math.round(12 + days * 1.2)));
@@ -296,13 +414,15 @@ function fail(msg) { const e = $('#err'); e.textContent = msg; e.classList.remov
 
 $('#go').onclick = async () => {
   const b = collect(); $('#err').classList.add('hidden');
-  if (b.trip.length < 8) return fail('Tell us a little about the trip first.');
-  if (b.start && b.end && b.end <= b.start) return fail('The end date needs to be after the start date.');
-  b.brief_text = asText(b); b.auto_approve = $('#auto').checked; b.est_minutes = estimate(b);
-  b.name = (t => t.length > 64 ? t.slice(0, 64).replace(/\s+\S*$/, '') + '…' : t)(b.trip.split(/[.\n:]/)[0].trim());
+  if (b.trip.length < 8 && !shots.length) return fail('Tell us a little about the trip first, or add a screenshot.');
+  if (b.fly_in.date && b.fly_out.date && b.fly_out.date < b.fly_in.date) return fail('The fly-out date is before the fly-in date.');
+  b.attachments = shots; b.brief_text = asText(b); b.auto_approve = $('#auto').checked; b.est_minutes = estimate(b);
+  b.name = (t => t.length > 64 ? t.slice(0, 64).replace(/\s+\S*$/, '') + '…' : t)((b.trip || 'Your trip').split(/[.\n:]/)[0].trim());
   if (!connected) { $('#briefOut').textContent = b.brief_text; show('fall'); return; }
+  $('#go').disabled = true; $('#go').firstChild.textContent = 'Sending…';
   try { await api('/api/settings', {auto_approve: b.auto_approve}); await api('/api/brief', b); $('#pTitle').textContent = b.name; show('prog'); poll(); }
   catch (e) { fail((e && e.error) || 'Could not reach Claude Code. Is it still running?'); }
+  finally { $('#go').disabled = false; $('#go').firstChild.textContent = 'Generate guide'; }
 };
 $('#auto').onchange = () => { if (connected) api('/api/settings', {auto_approve: $('#auto').checked}).catch(() => {}); };
 $('#copyBrief').onclick = () => navigator.clipboard.writeText($('#briefOut').textContent).then(() => $('#copyBrief').textContent = 'Copied');
