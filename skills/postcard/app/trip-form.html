@@ -250,7 +250,10 @@ body{background:var(--bg);font-family:"Inter var",Inter,-apple-system,BlinkMacSy
 .btn:disabled{opacity:.6;cursor:wait}
 @media (prefers-color-scheme:dark){.brand .mark path{opacity:.85}}
 .lv{display:grid;grid-template-columns:76px minmax(0,1fr) 62px;align-items:center;gap:10px;margin:0 0 6px}
-.lv-k{font-size:13.5px}
+.lv-k{font-size:13.5px;line-height:1.2}
+.lv-k small{display:block;font-size:11px;color:var(--faint);font-weight:400;margin-top:2px;white-space:nowrap}
+.lv{grid-template-columns:128px minmax(0,1fr) 58px;gap:8px;margin-bottom:9px}
+.layout{grid-template-columns:minmax(0,1fr) 340px}
 .lv-v{text-align:right}
 .card.side{padding:18px 18px 16px}
 .pace-h{margin-top:14px;padding-top:14px}
@@ -336,19 +339,21 @@ const $ = s => document.querySelector(s);
 const token = new URLSearchParams(location.hash.slice(1)).get('t') || '';
 const connected = location.protocol.startsWith('http') && token;
 const api = (path, body) => fetch(path, {method: body ? 'POST' : 'GET', headers: {'X-Token': token, 'Content-Type': 'application/json'}, body: body ? JSON.stringify(body) : undefined}).then(r => r.json().then(j => (r.ok ? j : Promise.reject(j))));
-const DRAFT = 'postcard-draft-v3';
-const INTERESTS = ['Nature', 'Food', 'Markets', 'Festivals', 'Nightlife', 'Culture', 'Museums', 'Shopping'];
+const DRAFT = 'postcard-draft-v4';
+const INTERESTS = [['Nature', 'hikes, parks, views'], ['Food', 'restaurants, local dishes'], ['Cafés', 'coffee, bakeries'],
+  ['Markets', 'day and night markets'], ['Nightlife', 'bars, clubs, live music'], ['Festivals', 'events on your dates'],
+  ['Culture', 'history, temples, museums'], ['Shopping', 'malls, boutiques, souvenirs']];
 const LEVEL = ['', 'Skip', 'Less', 'Some', 'More', 'Love'];
 const PACE = ['', 'Very slow', 'Relaxed', 'Balanced', 'Full', 'Packed'];
-function lever(host, key, words) {
+function lever(host, key, words, hint = '') {
   const row = document.createElement('label'); row.className = 'lv';
-  row.innerHTML = `<span class="lv-k">${key}</span><input type="range" min="1" max="5" step="1" value="3" data-k="${key}"><span class="lv-v"></span>`;
+  row.innerHTML = `<span class="lv-k">${key}<small>${hint}</small></span><input type="range" min="1" max="5" step="1" value="3" data-k="${key}"><span class="lv-v"></span>`;
   const r = row.querySelector('input'), v = row.querySelector('.lv-v');
   const paint = () => { v.textContent = words[r.value]; r.style.setProperty('--p', ((r.value - 1) / 4 * 100) + '%'); row.dataset.level = r.value; };
   r.addEventListener('input', () => { paint(); save(); }); paint(); host.append(row); return r;
 }
-const levers = INTERESTS.map(k => lever($('#levers'), k, LEVEL));
-const pace = lever($('#pace'), 'Days', PACE);
+const levers = INTERESTS.map(([k, h]) => lever($('#levers'), k, LEVEL, h));
+const pace = lever($('#pace'), 'Days', PACE, 'how full each day is');
 
 /* ---------- screenshots ---------- */
 let shots = [];   // {name, data}
