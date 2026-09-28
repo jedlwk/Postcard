@@ -38,7 +38,7 @@ Postcard's page opens. It says "from postcard · 1 skill", with tabs for **Overv
 
 ### 2. Make a guide
 
-Start a new Claude Code session and type `/postcard:postcard`. A page opens in your browser. Describe the trip, set the sliders if you like, and press **Generate guide**. When it is done, download the guide from the same page.
+Start a new Claude Code session and type `/postcard:postcard`. A page opens in your browser. Describe the trip, or tap one of the examples to fill it in. Set the sliders if you like and press **Generate guide**. When it is done, download the guide from the same page.
 
 Guides are saved in the folder Claude Code is open in. With no folder open, they go to a `Postcard` folder in your home folder.
 
