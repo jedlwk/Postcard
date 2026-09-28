@@ -20,7 +20,11 @@ Paste this in and confirm:
 jedlwk/Postcard
 ```
 
-Postcard now shows up in your plugin list. Click **Add** on it and you are done.
+Postcard now shows up in your plugin list. Search for "Postcard" if you don't see it, then click **Add** on it.
+
+Postcard's page opens. It says "from postcard · 1 skill", with tabs for **Overview**, **Skills · 1** and **Hooks · 1**. Check that the switch at the top right is on (blue). That's it.
+
+![Postcard's plugin page with the switch on](docs/3-postcard-on.png)
 
 **Using Claude Code in a terminal instead?** Type these into Claude Code, one at a time. They will not work in your normal shell.
 
