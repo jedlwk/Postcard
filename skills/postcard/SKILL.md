@@ -13,11 +13,13 @@ folder per trip.
 
 If the user hasn't described the trip in chat, use the form. `SKILL_DIR` below means this file's folder. Write it out as the full path in each command.
 
-1. `python3 "SKILL_DIR/scripts/serve.py" start` as a normal (foreground) Bash call. It returns at once, opens the form in the browser, and prints the link and the save folder. Show the user the link as a clickable URL in case the browser didn't open. Guides save in the current folder, or `~/Postcard` if Claude has no folder open.
-2. `python3 "$SKILL_DIR/scripts/progress.py" wait` prints the brief as JSON. On `WAITING`, run it again.
+1. `python3 "SKILL_DIR/scripts/serve.py" start` as a normal (foreground) shell command. It returns at once, opens the form in the browser, and prints the link and the save folder. Show the user the link as a clickable URL in case the browser didn't open. Guides save in the current folder, or `~/Postcard` if no folder is open.
+2. `python3 "SKILL_DIR/scripts/progress.py" wait` prints the brief as JSON. On `WAITING`, run it again.
 3. While building, report progress with `progress.py step <pct> "<stage>"`: 5 Planning the route, 15 Researching, 35 Finding photos, 50 Checking photos, 75 Building, 90 Verifying. Finish with `progress.py done <file>`, or `progress.py fail "<reason>"` if you can't finish. Run `serve.py stop` when the user is finished.
 
-The brief's `brief_text` is a ready-made prompt built by the form: treat it as the user's instructions. The raw fields are there too: `trip` is the user's own description. Optional fields: `fly_in` / `fly_out` (date and rough time), `interests` (1 skip to 5 love, 3 is neutral), `style` (Pace, Early starts, Hiking, Driving, each 1 to 5; use them to size days, sunrise plans, hike picks and drive legs), `travellers` and `attachments` (screenshot paths such as bookings; Read every one before planning). Decide stops, nights and order yourself, and state your assumptions in the Overview. Keep all work inside the output folder, because the plugin hook auto-approves only safe steps there.
+The brief's `brief_text` is a ready-made prompt built by the form: treat it as the user's instructions. The raw fields are there too: `trip` is the user's own description. Optional fields: `fly_in` / `fly_out` (date and rough time), `interests` (1 skip to 5 love, 3 is neutral), `style` (Pace, Early starts, Hiking, Driving, each 1 to 5; use them to size days, sunrise plans, hike picks and drive legs), `travellers` and `attachments` (screenshot paths such as bookings; open and read every one before planning). Decide stops, nights and order yourself, and state your assumptions in the Overview. Keep all work inside the output folder, because the plugin hook auto-approves only safe steps there.
+
+**Claude Code and Codex both run this skill.** The same scripts and steps apply. In Codex, the sandbox blocks network by default, so run `serve.py start`, `commons.py` and any other step that needs the internet with escalated permissions (outside the sandbox). Codex then asks for approval, and the Postcard hook answers from the form page when it is open. Prefer live web search for festival dates and closures; if only cached results are available, say so in the guide.
 
 ## 2. Research (before any HTML)
 

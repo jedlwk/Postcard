@@ -406,11 +406,11 @@ details.sent pre{white-space:pre-wrap;font:12.5px/1.55 ui-monospace,SFMono-Regul
   <div class="meter"><i id="pBar"></i></div>
   <div class="meta"><span id="pPct">0%</span><span><span id="pTime">0:00</span> elapsed · <b id="pEta">estimating…</b></span></div>
   <div class="now" id="pNow">Sending your brief…</div>
-  <details class="sent hidden" id="sent"><summary>The brief Claude received</summary><pre id="sentText"></pre></details>
+  <details class="sent hidden" id="sent"><summary>The brief your agent received</summary><pre id="sentText"></pre></details>
   <div class="modal hidden" id="askModal" role="dialog" aria-modal="true" aria-labelledby="askTitle">
     <div class="sheet">
       <div class="sheet-top"><span class="pill" id="askCount">Needs you</span><span class="paused">Build paused</span></div>
-      <h3 id="askTitle">Claude wants to…</h3>
+      <h3 id="askTitle">Your agent wants to…</h3>
       <code id="askDetail"></code>
       <p class="why" id="askWhy"></p>
       <div class="acts"><button class="btn ghost" id="askDeny">Deny</button><button class="btn accent" id="askAllow">Allow</button></div>
@@ -422,14 +422,14 @@ details.sent pre{white-space:pre-wrap;font:12.5px/1.55 ui-monospace,SFMono-Regul
   <div id="pNotice"></div>
   <div id="pDone"></div>
   <ul class="log" id="pLog"></ul>
-  <p style="color:var(--faint);font-size:13px;margin-top:26px">Keep Claude Code open until this finishes. A full guide usually takes 15 to 30 minutes. You can close this tab and reopen it from the same link.</p>
+  <p style="color:var(--faint);font-size:13px;margin-top:26px">Keep Claude Code or Codex open until this finishes. A full guide usually takes 15 to 30 minutes. You can close this tab and reopen it from the same link.</p>
 </div>
 
 <!-- ===================== NO SERVER FALLBACK ===================== -->
 <div class="wrap fallback hidden" id="fallView">
   <div class="eyebrow">Almost there</div>
-  <h1 style="font-size:28px;letter-spacing:-.02em;margin:0 0 8px">Open this from Claude Code</h1>
-  <p style="color:var(--soft)">This page isn't connected to Claude Code, so it can't start the build. In Claude Code, type <b>/postcard</b> and it will open a connected copy. Or copy the brief below and paste it into Claude Code.</p>
+  <h1 style="font-size:28px;letter-spacing:-.02em;margin:0 0 8px">Open this from your agent</h1>
+  <p style="color:var(--soft)">This page isn't connected to an agent, so it can't start the build. Start Postcard from Claude Code (<b>/postcard:postcard</b>) or Codex (<b>$postcard</b>) and it opens a connected copy. Or copy the brief below and paste it into either one.</p>
   <p><button class="btn" id="copyBrief">Copy brief</button> <button class="btn ghost" id="backBtn">Back to the form</button></p>
   <pre id="briefOut"></pre>
 </div>
@@ -534,7 +534,7 @@ const ta = $('#trip');
 function grow() { ta.style.height = 'auto'; ta.style.height = Math.max(110, ta.scrollHeight) + 'px'; }
 ta.addEventListener('input', grow);
 function asText(b) {
-  // the meta-prompt Claude Code receives: the user's words first, then what the form adds
+  // the meta-prompt the agent receives: the user's words first, then what the form adds
   const f = x => [x.date && new Date(x.date + 'T00:00').toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'}), x.time && 'around ' + x.time].filter(Boolean).join(' ');
   const nights = b.fly_in.date && b.fly_out.date ? Math.round((new Date(b.fly_out.date) - new Date(b.fly_in.date)) / 864e5) : 0;
   const more = Object.entries(b.interests).filter(([, v]) => v > 3).map(([k, v]) => `${k}${v === 5 ? ' (a priority)' : ''}`);
@@ -578,7 +578,7 @@ $('#go').onclick = async () => {
   if (!connected) { $('#briefOut').textContent = b.brief_text; show('fall'); return; }
   $('#go').disabled = true; $('#go').firstChild.textContent = 'Sending…';
   try { await api('/api/settings', {auto_approve: b.auto_approve}); await api('/api/brief', b); $('#pTitle').textContent = b.name; $('#sentText').textContent = b.brief_text; $('#sent').classList.remove('hidden'); show('prog'); poll(); }
-  catch (e) { fail((e && e.error) || 'Could not reach Claude Code. Is it still running?'); }
+  catch (e) { fail((e && e.error) || 'Could not reach your agent. Is Claude Code or Codex still running?'); }
   finally { $('#go').disabled = false; $('#go').firstChild.textContent = 'Generate guide'; }
 };
 $('#auto').onchange = () => { if (connected) api('/api/settings', {auto_approve: $('#auto').checked}).catch(() => {}); };
@@ -626,17 +626,17 @@ $('#auto2').onchange = () => api('/api/settings', {auto_approve: $('#auto2').che
 async function poll() {
   let st;
   try { st = await api('/api/state'); fails = 0; }
-  catch (e) { if (++fails > 3) { $('#pNotice').innerHTML = '<div class="notice bad">Lost contact with Claude Code. If you closed it, reopen it and run /postcard again.</div>'; } return setTimeout(poll, 4000); }
+  catch (e) { if (++fails > 3) { $('#pNotice').innerHTML = '<div class="notice bad">Lost contact with your agent. If you closed it, reopen it and start Postcard again.</div>'; } return setTimeout(poll, 4000); }
   const s = st.status || {}; const pct = s.pct || 0;
   $('#pBar').style.width = pct + '%'; $('#pPct').textContent = pct + '%';
   $('#pTime').textContent = s.started_at ? clock((s.done ? s.updated_at : st.server_time) - s.started_at) : '0:00';
-  $('#pNow').textContent = s.done ? 'Your guide is ready.' : (s.stage || 'Waiting for Claude Code…');
+  $('#pNow').textContent = s.done ? 'Your guide is ready.' : (s.stage || 'Waiting for your agent…');
   const log = (s.log || []).slice(0, s.done ? undefined : -1);
   $('#pLog').innerHTML = log.map(l => `<li><span>${esc(l.stage)}</span><time>${new Date(l.at * 1000).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</time></li>`).join('');
   renderAsk(st);
   $('#pEta').textContent = s.done ? 'done' : eta(st, pct);
   $('#auto2').checked = st.auto_approve;
-  $('#pNotice').innerHTML = s.failed ? `<div class="notice bad">${esc(s.stage)}</div>` : st.stale ? '<div class="notice warn">No update for 20 minutes. Check Claude Code: it may be waiting for you there.</div>' : '';
+  $('#pNotice').innerHTML = s.failed ? `<div class="notice bad">${esc(s.stage)}</div>` : st.stale ? '<div class="notice warn">No update for 20 minutes. Check Claude Code or Codex: it may be waiting for you there.</div>' : '';
   if (s.done) { $('#pEye').textContent = 'Ready'; $('#pDone').innerHTML = `<div class="done"><div><b>Download your guide</b><p>Also saved to ${esc(s.output)}</p></div><a class="btn accent" href="/api/download?token=${encodeURIComponent(token)}">Download</a></div>`; return; }
   if (!s.failed) setTimeout(poll, st.pending.length ? 1500 : 3000);
 }

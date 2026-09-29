@@ -35,7 +35,7 @@ def main(argv):
         while time.time() < end:
             b = ts.read(ts.BRIEF)
             if b:
-                update(pct=4, stage='Claude Code picked up your brief')
+                update(pct=4, stage='Your agent picked up the brief')
                 print(json.dumps(b, ensure_ascii=False, indent=1))
                 return 0
             if not ts.active_session():

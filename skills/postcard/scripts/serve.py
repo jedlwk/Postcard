@@ -103,7 +103,7 @@ class Handler(BaseHTTPRequestHandler):
             body['attachments'] = save_attachments(body.get('attachments') or [])
             body['received_at'] = time.strftime('%Y-%m-%d %H:%M:%S')
             ts.write(ts.BRIEF, body)
-            ts.write(ts.STATUS, {'pct': 2, 'stage': 'Brief received. Waiting for Claude Code to start.',
+            ts.write(ts.STATUS, {'pct': 2, 'stage': 'Brief received. Waiting for your agent to start.',
                                  'log': [], 'updated_at': ts.now()})
             return self._send(200, {'ok': True})
         if u.path == '/api/settings':

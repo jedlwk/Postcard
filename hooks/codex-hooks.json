@@ -1,0 +1,17 @@
+{
+  "description": "Postcard: answer Codex approval prompts from the trip form during a build",
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$PLUGIN_ROOT/hooks/approve.py\" --codex",
+            "statusMessage": "Checking with the Postcard page",
+            "timeout": 330
+          }
+        ]
+      }
+    ]
+  }
+}
