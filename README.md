@@ -2,6 +2,8 @@
 
 Describe a trip in your own words and Postcard turns it into a travel guide. Every stop gets its own tab with day plans, where to stay and what is on. Real photos and maps are built in. It runs on your own Claude Code, so there is no API key to set up.
 
+![The Postcard form: describe the trip, pick an example, set the sliders](docs/postcard-form.jpg)
+
 ## Get started
 
 ### 1. Install
