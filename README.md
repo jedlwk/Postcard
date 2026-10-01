@@ -90,6 +90,8 @@ Start a new Codex session and type `$postcard`. In the ChatGPT app, type `@` and
 
 **You need Python 3.** Everything else installs itself.
 
+**Used an earlier copy of the skill?** If you copied a `trip-infographic` folder into `~/.claude/skills/` or `~/.codex/skills/`, delete it. It overlaps with the plugin and both would try to start.
+
 **Getting updates.** In the Claude app, go to **Settings** and open **Plugins**, then Postcard, and click **Update**. In Codex, run `codex plugin marketplace upgrade`. Start a new session afterwards.
 
 ## For contributors
