@@ -95,3 +95,8 @@ Start a new Codex session and type `$postcard`. In the ChatGPT app, type `@` and
 ## For contributors
 
 Run the tests with `python3 tests/run.py`. `CHANGELOG.md` lists what changed. The skill is in `skills/postcard`, the approval hook in `hooks`.
+
+## License
+
+MIT. See `LICENSE`. The photos in the examples come from Wikimedia Commons under their own licences, credited where they appear.
+

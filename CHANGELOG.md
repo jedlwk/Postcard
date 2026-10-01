@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+MIT license added.
+
 ## 2.0.0
 
 Guides are now built from a plan file instead of hand-written HTML.

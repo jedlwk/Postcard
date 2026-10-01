@@ -1,9 +1,10 @@
 {
   "name": "postcard",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Describe a trip in your own words. Your agent researches it and builds a travel guide with photos, maps and a tab for every stop.",
   "author": {
     "name": "jedlwk"
   },
-  "hooks": "./hooks/codex-hooks.json"
+  "hooks": "./hooks/codex-hooks.json",
+  "license": "MIT"
 }
