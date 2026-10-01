@@ -1,0 +1,25 @@
+{
+ "name": "venice-4d",
+ "brief": {
+  "trip": "4 days in Venice in October. Wander, eat cicchetti, Rialto Market in the morning, half a day on Burano and Murano. Avoid the big queues where we can.",
+  "fly_in": {
+   "date": "2027-10-08",
+   "time": ""
+  },
+  "fly_out": {
+   "date": "2027-10-12",
+   "time": ""
+  }
+ },
+ "expect": {
+  "min_tabs": 3,
+  "min_days": 4,
+  "max_days": 5,
+  "must_mention": [
+   "Rialto",
+   "Burano",
+   "Murano"
+  ],
+  "verified": true
+ }
+}

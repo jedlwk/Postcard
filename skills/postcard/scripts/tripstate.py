@@ -3,7 +3,7 @@
 Everything sits in ~/.postcard/ so the server, the hook and Claude's
 progress calls all agree without passing paths around. One build at a time.
 """
-import json, os, time
+import json, os, subprocess, sys, time
 
 HOME = os.path.expanduser('~/.postcard')
 SESSION = os.path.join(HOME, 'session.json')
@@ -50,5 +50,27 @@ def active_session():
     return None
 
 
+def clear_attachments():
+    """Booking screenshots can hold passport or booking numbers. Delete them when done."""
+    import shutil
+    shutil.rmtree(os.path.join(HOME, 'attachments'), ignore_errors=True)
+
+
 def now():
     return time.time()
+
+
+def ensure_pillow():
+    """Photos need Pillow; install it once, quietly, so users never have to."""
+    try:
+        import PIL  # noqa: F401
+        return
+    except ImportError:
+        pass
+    import subprocess
+    print('Installing Pillow for photo processing (one time)...', flush=True)
+    for extra in ([], ['--user'], ['--break-system-packages', '--user']):
+        r = subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'pillow', *extra], capture_output=True)
+        if r.returncode == 0:
+            return
+    print('Could not install Pillow automatically. Run: python3 -m pip install pillow', flush=True)

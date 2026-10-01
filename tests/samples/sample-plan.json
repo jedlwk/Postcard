@@ -1,0 +1,61 @@
+{
+  "title": "Sample guide",
+  "headline": "A sample guide, built from test data.",
+  "eyebrow": "TEST DATA &middot; NOT TRAVEL ADVICE",
+  "lede": "Four days across two made-up stops. This file exists so the renderer, the checker and the tabs can be tested. **None of the facts are real.**",
+  "start": "2027-10-08", "end": "2027-10-12",
+  "hero": {"image": "photos/hero.jpg", "alt": "Test image", "credit": "Generated test image, public domain"},
+  "verification": {"status": "unchecked"},
+  "flights": [{"label": "Flight in (test)", "start": "2027-10-08T12:00", "end": "2027-10-08T14:00", "note": "test"}],
+  "book_check": [
+    {"when": "Now", "text": "**Beds.** Book refundable rooms first."},
+    {"when": "Apr 15, 2027", "date": "2027-04-15", "text": "**Timed tickets** go on sale at 08:00."}
+  ],
+  "weather": {
+    "title": "What the weather feels like", "intro": "Test numbers in &deg;C.",
+    "rows": [
+      {"label": "Stop A", "sub": "sea level", "lo": 12, "hi": 21, "feels_lo": 11, "feels_hi": 22, "rain": "60 mm · 7 wet days", "wind": "light", "color": "s1"},
+      {"label": "Stop B", "sub": "hills", "lo": 8, "hi": 17, "feels_lo": 6, "feels_hi": 17, "rain": "70 mm · 8 wet days", "wind": "breezy", "color": "s2"}
+    ],
+    "notes": ["**Packing.** A light rain shell and one warm layer."]
+  },
+  "risks": {"tag": "Risks", "title": "What could change the plan", "intro": "Test risk cards.",
+    "cards": [{"title": "Road works", "kicker": "Test card", "items": ["**Mon:** a lane is closed for repairs", "Allow an extra 20 minutes"]}]},
+  "sources": [{"claim": "Opening hours are placeholders", "url": "https://example.com/hours", "checked": "2026-09-28"}],
+  "stops": [
+    {"id": "stop-a", "name": "Stop A, the first place", "tab": "Stop A", "tab_sub": "2 nights", "color": "s1", "sleep": "Old town",
+     "dates": "Fri&ndash;Sun, Oct 8&ndash;10, 2027 &middot; 2 nights",
+     "badges": {"category": "City break", "intensity": 2, "vibes": ["Food &amp; Markets", "Walking"]},
+     "maps_link": {"url": "https://www.google.com/maps/search/?api=1&query=Venice", "label": "Open the area in Google Maps"},
+     "alert": {"label": "Test alert", "text": "Shown above the photos when a risk lands on these dates."},
+     "photos": [
+       {"file": "photos/a1.jpg", "what": "A test photo", "where": "Somewhere", "credit": "Test image"},
+       {"file": "photos/a2.jpg", "what": "Another test photo", "where": "Elsewhere", "credit": "Test image"},
+       {"file": "photos/a3.jpg", "what": "A third", "where": "Third place", "credit": "Test image"}],
+     "map": {"file": "photos/map.jpg", "caption": "A test map.", "credit": "Test, public domain", "source_url": "https://example.com/map"},
+     "days": [
+       {"date": "2027-10-08", "cat": "Arrival", "lead": "Land at **12:00**, drop bags, walk the old town.", "bullets": ["Check in after 14:00", "Dinner near the water {book}"]},
+       {"date": "2027-10-09", "cat": "Food", "lead": "Morning market, then a long lunch.", "bullets": ["Market is best before 10:00 {must}", "Lunch: a test restaurant {michelin:bib}"]},
+       {"date": "2027-10-10", "cat": "Nature", "lead": "A half day out, then back for dinner.", "bullets": ["Take the early boat {car}"]}],
+     "stays": [{"nights": "Fri&ndash;Sun &middot; Oct 8&ndash;10 &middot; 2 nights", "base": "Old town", "why": "Walkable to everything.",
+                "pick": {"name": "A test hotel", "text": "small, so book early."}, "alts": [{"label": "Cheaper", "text": "the mainland side"}],
+                "links": [{"label": "Hotels in the old town", "url": "https://www.google.com/maps/search/?api=1&query=hotels"}]}],
+     "know": ["Cash is still useful at small stalls.", "Closed on Mondays: the museum."],
+     "festivals": [{"tag": "high", "text": "**A test festival**, Oct 9 to 10."}, {"tag": "uncertain", "text": "A test event that may move."}],
+     "fun_fact": "This is a test fun fact.",
+     "hikes": {"sub": "Test hikes.", "items": [{"name": "Test loop", "tier": "must", "trait": "Views", "stats": ["5 km", "120 m", "1.5 hr"], "diff": "Easy", "where": "**Start:** the north gate.<br>Quiet in the morning.", "url": "https://example.com/trail"}]},
+     "shortlist": {"sub": "Places to slot in.", "groups": [{"name": "Near the centre", "spots": [{"name": "A test spot", "url": "https://example.com", "must": true, "meta": ["walk", "1 hr"], "why": "Why it is worth it."}, {"name": "Another spot", "car": true, "meta": ["30 min"], "why": "Easier with a car."}]}]},
+     "more": {"_sub": "Test lists.", "Food": [{"name": "A test cafe", "why": "good coffee", "area": "Centre"}], "Markets": [{"name": "Test market", "why": "mornings only", "area": "North"}], "Nature": [{"name": "Test garden", "area": "East"}]},
+     "reading": [{"label": "A test article", "src": "example.com, 2026", "url": "https://example.com/a"}]},
+    {"id": "stop-b", "name": "Stop B, the second place", "tab": "Stop B", "tab_sub": "2 nights", "color": "s2", "sleep": "Hill town",
+     "dates": "Sun&ndash;Tue, Oct 10&ndash;12, 2027 &middot; 2 nights",
+     "photos": [{"file": "photos/b1.jpg", "what": "Test photo", "where": "Hill", "credit": "Test image"}, {"file": "photos/b2.jpg", "what": "Test photo 2", "where": "Valley", "credit": "Test image"}],
+     "days": [
+       {"date": "2027-10-11", "cat": "Scenic", "lead": "Slow morning, then the viewpoint.", "bullets": ["Sunset is around 18:10"]},
+       {"date": "2027-10-12", "cat": "Travel", "lead": "Pack, one last coffee, fly home at **16:00**."}],
+     "know": ["Buses are every 30 minutes."]}
+  ],
+  "extras": [{"id": "logistics", "name": "Logistics", "sub": "getting around", "title": "Getting between stops", "intro": "Test cards.",
+    "cards": [{"title": "Stop A to Stop B", "kicker": "Sun Oct 10 &middot; 2 hr", "items": ["Take the **09:10** train", "Book seats {book}"]}]}],
+  "footnote": "2027 dates are projected from the latest edition. Recheck closer to travel."
+}

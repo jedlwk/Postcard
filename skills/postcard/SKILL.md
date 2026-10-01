@@ -1,70 +1,63 @@
 ---
 name: postcard
-description: Build a photo-rich, self-contained, tabbed HTML trip guide (a tab per stop, day plans, where to stay, hikes, festivals, weather, risks, logistics). Use when the user asks for a trip document, itinerary, travel guide or "what to see" page, or to revise one. Starts with a browser form unless the brief is already in chat.
+description: Plans a trip and builds it as a self-contained, tabbed HTML guide with real photos, maps, day plans, where to stay, weather, festivals, risks and logistics, plus a calendar file. Use when the user asks for a trip plan, itinerary, travel guide or "what to see" page, wants to change an existing Postcard guide, or runs /postcard. Opens a browser form unless the trip is already described in chat. Does not book anything.
 ---
 
-# Trip guide builder
+# Postcard
 
-Output is one HTML file: fonts and photos embedded as base64, no external
-requests, no JavaScript (CSS-only tabs). Save it as `<save folder>/<trip>/<trip>.html`, one
-folder per trip.
+Output: `<save folder>/<trip>/` holding `plan.json`, `photos/`, the guide `<title>.html` and a `.ics` calendar. `SKILL_DIR` below means this file's folder. Write the full path in each command.
 
 ## 1. Get the brief
 
-If the user hasn't described the trip in chat, use the form. `SKILL_DIR` below means this file's folder. Write it out as the full path in each command.
+If the trip is not already described in chat, open the form.
 
-1. `python3 "SKILL_DIR/scripts/serve.py" start` as a normal (foreground) shell command. It returns at once, opens the form in the browser, and prints the link and the save folder. Show the user the link as a clickable URL in case the browser didn't open. Guides save in the current folder, or `~/Postcard` if no folder is open.
-2. `python3 "SKILL_DIR/scripts/progress.py" wait` prints the brief as JSON. On `WAITING`, run it again.
-3. While building, report progress with `progress.py step <pct> "<stage>"`: 5 Planning the route, 15 Researching, 35 Finding photos, 50 Checking photos, 75 Building, 90 Verifying. Finish with `progress.py done <file>`, or `progress.py fail "<reason>"` if you can't finish. Run `serve.py stop` when the user is finished.
+1. Run `python3 "SKILL_DIR/scripts/serve.py" start` as a normal foreground command. It returns at once, opens the form in the browser and prints the link and save folder. Show the link in case the browser did not open.
+2. Run `python3 "SKILL_DIR/scripts/progress.py" wait`. It prints the brief as JSON. On `WAITING`, run it again.
+3. Treat `brief_text` as the user's instructions. Raw fields: `trip` (their words), `fly_in` and `fly_out` (date, rough time), `interests` (1 skip to 5 love, 3 normal), `style` (Pace, Early starts, Hiking, Driving, 1 to 5), `travellers`, `attachments` (screenshot paths: open and read every one first, bookings in them are fixed).
 
-The brief's `brief_text` is a ready-made prompt built by the form: treat it as the user's instructions. The raw fields are there too: `trip` is the user's own description. Optional fields: `fly_in` / `fly_out` (date and rough time), `interests` (1 skip to 5 love, 3 is neutral), `style` (Pace, Early starts, Hiking, Driving, each 1 to 5; use them to size days, sunrise plans, hike picks and drive legs), `travellers` and `attachments` (screenshot paths such as bookings; open and read every one before planning). Decide stops, nights and order yourself, and state your assumptions in the Overview. Keep all work inside the output folder, because the plugin hook auto-approves only safe steps there.
+**Ask questions only when blocked** (no usable dates, an ambiguous destination, flights that contradict each other). Ask at most 3, in chat, in one message. Otherwise choose sensibly and state the assumptions on the Overview tab.
 
-**Claude Code and Codex both run this skill.** The same scripts and steps apply. In Codex, the sandbox blocks network by default, so run `serve.py start`, `commons.py` and any other step that needs the internet with escalated permissions (outside the sandbox). Codex then asks for approval, and the Postcard hook answers from the form page when it is open. Prefer live web search for festival dates and closures; if only cached results are available, say so in the guide.
+**Resume.** Before starting, run `progress.py resume`. If it lists an unfinished trip folder that matches this trip, continue from its `plan.json` instead of starting over.
 
-## 2. Research (before any HTML)
+## 2. Build, in this order
 
-- **Festivals and events:** date them from the latest real edition, then project to the trip year with a confidence tag (HIGH / LIKELY / AT RISK). Never omit an event because it's unconfirmed.
-- **Weigh the most recent year most.** Include last season's smoke, closures and road outages on the user's exact dates, and what locals actually do about them.
-- **Verify, don't recall.** Check every closure, drive time, opening hour, fee, and that each restaurant is still open. Say plainly when something can't be confirmed.
-- **Content weighting:** markets, food, nature, festivals and neighbourhoods first. Skip museums unless unmissable, and flag real must-sees.
-- **Stays:** name areas, not listings. Name a specific property only when it changes the day (e.g. the only lodge inside a park).
+Report each stage with `progress.py step <pct> "<stage>"`.
 
-## 3. Photos
+1. **5, Planning the route.** Stops, nights and order. Save a first `plan.json` with `"stage": "planned"`.
+2. **15, Researching.** Read `references/research.md` and follow it. Every price, hour, closure and date goes into `sources`. Set `"stage": "researched"`.
+3. **35, Finding photos.** Read `references/photos.md`. Photos go in `<trip>/photos/`. **50, Checking photos:** look at the contact sheet.
+4. **70, Writing the guide.** Fill in `plan.json` using `references/plan-schema.md`. Run `render_guide.py plan.json --check`, then `render_guide.py plan.json`. Never hand-write the HTML.
+5. **85, Checking.** Run `validate_guide.py <guide>.html --plan plan.json`. Fix every error and read every warning. Repeat until it passes.
+6. **92, Fact-check pass.** Re-read the finished text and re-verify every claim (the checklist is in `research.md`). Fix the plan, re-render, re-validate. Then set `verification.second_pass` to true and `status` to `verified`. If you cannot verify, leave `status` as `partial` and say what is missing.
+7. **Done.** `progress.py done "<guide.html>"`. Run `serve.py stop` when the user is finished. If you cannot finish, run `progress.py fail "<reason>"`.
 
-`commons.py find-cat` → `subcats` (not optional) → `list-cat` → `fetch`, then `contactsheet.py`, and look at the sheet. Match the season, credit every photo, never caption a substitute as the real place. Size: about 4–5 photos per night, at most 2 of one place. `imageprep.py` at 820×547, q58. Keep the whole file under about 12 MB.
+## 3. Changing a guide
 
-Maps: use real published maps (NPS, Wikivoyage, Commons). Never draw your own.
+Open `<trip>/plan.json`, edit it, re-render, re-validate. New facts still need sources and a re-check. A guide without a `plan.json` is an older one: see `references/layout.md` for editing HTML safely.
 
-## 4. Layout
+## 4. Rules
 
-Pattern and CSS: `references/tabbed-layout.css`. Design tokens and components: `references/build-recipe.md`.
+- **Accuracy over completeness.** Say plainly what is unconfirmed. A guide that is not verified shows a banner. Do not invent places, hours, prices or quotes.
+- **Credit every photo and map.** Maps are real published maps, never drawn.
+- **Keep work inside the save folder.** The plugin hook only auto-approves safe steps there.
+- **Writing:** short, specific and plain. Few dashes, no filler, no notes about how the guide was made.
+- **Do not book, buy or log in** anywhere. Booking links open a search the user completes.
+- **Claude Code and Codex both run this skill.** In Codex the sandbox blocks the network, so run `serve.py`, `commons.py` and any other step that needs the internet with escalated permissions. Codex then asks, and the Postcard hook answers from the form page when it is open. Prefer live web search. If only cached results exist, say so in the guide.
 
-- **Top:** hero, then the route strip, then a sticky tab bar: Overview · one tab per stop · layover (if any) · Logistics.
-- **Overview tab:**
-  - A day-by-day table; each row opens its stop.
-  - A dated "book and check" list (what to book now, what to recheck and when).
-  - A weather strip with a "feels like" band.
-  - Risks, weighted to the latest season.
-- **Each stop tab:**
-  - Header and badges.
-  - A gallery showing 2 full photos, with the map beside it (at most half width, click to enlarge via `:target`).
-  - "Day by day" beside a side column: where to stay, know before you go, festivals, one fun fact.
-  - Hikes.
-  - A long reference list folded into `<details>`.
-  - A "Next →" button.
-- **Put information where it's used.** No "other notes" section: access rules go in their stop's tab, and car and flight details go in the day they happen.
+## Files
 
-## 5. Writing
+| File | Use |
+|---|---|
+| `references/research.md` | what to research, how to verify, the second pass |
+| `references/photos.md` | the Commons photo workflow |
+| `references/plan-schema.md` | every `plan.json` field |
+| `references/layout.md` | what the renderer builds, editing, browser checks |
+| `references/pitfalls.md` | bugs already hit |
+| `scripts/render_guide.py` | plan to HTML and calendar |
+| `scripts/validate_guide.py` | checks a finished guide |
+| `scripts/commons.py`, `contactsheet.py` | photo sourcing and review |
+| `scripts/serve.py`, `progress.py` | the form and its progress bar |
+| `scripts/htmltool.py` | structure check, strip base64, legacy edits |
+| `templates/` | fonts and CSS used by the renderer |
 
-Short, plain, specific. Few dashes, no filler ("genuinely", "single most", "it's worth noting"), and no notes about how the document was made. Put times, prices and names on the page. Cut repetition across tabs.
-
-## 6. Verify before saying done
-
-- `htmltool.py check` must PASS (nesting, placeholders, images).
-- In a browser, check with JS (pages over ~8 MB screenshot blank; for visuals, use a copy with images swapped for placeholders): every tab opens, 0 broken images, no horizontal scroll at 375 px, and weekday labels match the dates.
-- Final pass for hallucinations: re-check every name, date, price and "closed/open" claim added this session.
-- Report anything unverified to the user.
-
-## Scripts
-
-`commons.py` sourcing · `contactsheet.py` visual audit · `imageprep.py` crop and encode · `htmltool.py check | lite | gallery` (import `find_close` / `replace_block` for block edits, never regex a closing tag) · `serve.py`, `progress.py` form and progress · `selftest.py`. Standard library only, except Pillow, which `serve.py start` installs if it's missing. Bugs already hit and their fixes: `references/pitfalls.md`.
+Needs Python 3. Pillow installs itself when the form starts.

@@ -5,6 +5,7 @@
     python3 progress.py step 30 "Finding photos"
     python3 progress.py done "<path to finished .html>"
     python3 progress.py fail "What went wrong"
+    python3 progress.py resume [--out FOLDER]   find an unfinished guide to continue
 
 `wait` returns after --timeout seconds (default 540) with WAITING and exit code 2,
 so it fits inside one Bash call; just run it again.
@@ -51,6 +52,24 @@ def main(argv):
         if not os.path.isfile(path):
             sys.exit(f'no such file: {path}')
         update(pct=100, stage='Done', done=True, output=path)
+        ts.clear_attachments()
+    elif cmd == 'resume':
+        out = argv[argv.index('--out') + 1] if '--out' in argv else (ts.read(ts.SESSION, {}) or {}).get('out_root', os.getcwd())
+        found = []
+        for name in os.listdir(out) if os.path.isdir(out) else []:
+            pf = os.path.join(out, name, 'plan.json')
+            if os.path.isfile(pf):
+                try:
+                    plan = json.load(open(pf))
+                except ValueError:
+                    continue
+                done = os.path.isfile(os.path.join(out, name, plan.get('title', name) + '.html'))
+                found.append((os.path.getmtime(pf), pf, plan.get('stage', 'planned'), done))
+        found.sort(reverse=True)
+        if not found:
+            print('NONE')
+        for _, pf, stage, done in found[:5]:
+            print(f'{pf}\tstage={stage}\t{"built" if done else "not built yet"}')
     elif cmd == 'fail':
         update(stage='Stopped: ' + ' '.join(argv[1:]), failed=True)
     else:

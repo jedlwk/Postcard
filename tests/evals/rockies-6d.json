@@ -1,0 +1,26 @@
+{
+ "name": "rockies-6d",
+ "brief": {
+  "trip": "6 days in the Canadian Rockies in late July, two of us. Fly into Calgary, 3 nights in Banff, then the Icefields Parkway to Jasper for 2 nights. Sunrise at Moraine Lake, a couple of good hikes and a side trip to Yoho.",
+  "fly_in": {
+   "date": "2027-07-25",
+   "time": ""
+  },
+  "fly_out": {
+   "date": "2027-07-31",
+   "time": ""
+  }
+ },
+ "expect": {
+  "min_tabs": 4,
+  "min_days": 6,
+  "max_days": 7,
+  "must_mention": [
+   "Moraine",
+   "Banff",
+   "Jasper",
+   "Icefields"
+  ],
+  "verified": true
+ }
+}

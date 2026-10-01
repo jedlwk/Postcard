@@ -157,22 +157,6 @@ def state():
             'status': st, 'pending': pending, 'stale': stale, 'server_time': ts.now()}
 
 
-def ensure_pillow():
-    """Photos need Pillow; install it once, quietly, so users never have to."""
-    try:
-        import PIL  # noqa: F401
-        return
-    except ImportError:
-        pass
-    import subprocess
-    print('Installing Pillow for photo processing (one time)...', flush=True)
-    for extra in ([], ['--user'], ['--break-system-packages', '--user']):
-        r = subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'pillow', *extra], capture_output=True)
-        if r.returncode == 0:
-            return
-    print('Could not install Pillow automatically. Run: python3 -m pip install pillow', flush=True)
-
-
 def default_out(cwd):
     """Save next to the user's work, unless Claude was started with no real folder."""
     c = os.path.realpath(cwd)
@@ -184,7 +168,7 @@ def default_out(cwd):
 def launch(out):
     """Start the server detached, open the form, print the link, return at once."""
     ts.ensure()
-    ensure_pillow()
+    ts.ensure_pillow()
     old = ts.active_session()
     if old:
         url = f'http://127.0.0.1:{old["port"]}/#t={old["token"]}'
@@ -230,6 +214,7 @@ def serve(out, cwd):
     def shutdown(*_):
         sess['active'] = False
         ts.write(ts.SESSION, sess)
+        ts.clear_attachments()
         sys.exit(0)
     signal.signal(signal.SIGTERM, shutdown)
     signal.signal(signal.SIGINT, shutdown)
@@ -240,6 +225,7 @@ def serve(out, cwd):
 
 def stop():
     s = ts.read(ts.SESSION)
+    ts.clear_attachments()
     if s and ts.pid_alive(s.get('pid')):
         os.kill(int(s['pid']), signal.SIGTERM)
         print('stopped')

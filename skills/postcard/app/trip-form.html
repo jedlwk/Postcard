@@ -396,7 +396,7 @@ details.sent pre{white-space:pre-wrap;font:12.5px/1.55 ui-monospace,SFMono-Regul
         <button class="btn" id="go">Generate guide</button>
       </div>
 <div class="err hidden" id="err"></div></div>
-  <p class="fine" id="estLine">This takes a while: roughly 15 to 30 minutes depending on the trip. You'll see a live estimate once it starts.</p>
+  <p class="fine" id="estLine">This takes a while: roughly 20 to 40 minutes depending on the trip. You'll see a live estimate once it starts.</p>
 </div>
 
 <!-- ===================== PROGRESS ===================== -->
@@ -422,7 +422,7 @@ details.sent pre{white-space:pre-wrap;font:12.5px/1.55 ui-monospace,SFMono-Regul
   <div id="pNotice"></div>
   <div id="pDone"></div>
   <ul class="log" id="pLog"></ul>
-  <p style="color:var(--faint);font-size:13px;margin-top:26px">Keep Claude Code or Codex open until this finishes. A full guide usually takes 15 to 30 minutes. You can close this tab and reopen it from the same link.</p>
+  <p style="color:var(--faint);font-size:13px;margin-top:26px">Keep Claude Code or Codex open until this finishes. A full guide usually takes 20 to 40 minutes. You can close this tab and reopen it from the same link.</p>
 </div>
 
 <!-- ===================== NO SERVER FALLBACK ===================== -->
@@ -565,7 +565,7 @@ function estimate(b) {
   if (b.fly_in.date && b.fly_out.date) days = Math.round((new Date(b.fly_out.date) - new Date(b.fly_in.date)) / 864e5);
   if (!days) { const m = b.trip.match(/(\d+)\s*(days?|nights?|d\b|n\b)/i); if (m) days = +m[1]; }
   if (!days) days = /fortnight/i.test(b.trip) ? 14 : /week\s*end|weekend/i.test(b.trip) ? 3 : /week/i.test(b.trip) ? 7 : 8;
-  return Math.max(15, Math.min(30, Math.round(12 + days * 1.2)));
+  return Math.max(20, Math.min(40, Math.round(14 + days * 1.6)));
 }
 function fail(msg) { const e = $('#err'); e.textContent = msg; e.classList.remove('hidden'); }
 

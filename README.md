@@ -1,6 +1,6 @@
 # Postcard
 
-Describe a trip in your own words and Postcard turns it into a travel guide. Every stop gets its own tab with day plans, where to stay and what is on. Real photos and maps are built in. It works with Claude Code and with Codex, on your own plan, so there is no API key to set up.
+Describe a trip in your own words and Postcard turns it into a travel guide. Every stop gets its own tab with day plans, where to stay and what is on. Real photos and maps are built in. It works with Claude Code and with Codex (Codex support is in beta), on your own plan, so there is no API key to set up.
 
 ![The Postcard form: describe the trip, pick an example, set the sliders](docs/postcard-form.jpg)
 
@@ -42,7 +42,7 @@ Postcard's page opens. It says "from postcard · 1 skill", with tabs for **Overv
 
 Start a new Claude Code session and type `/postcard:postcard`. A page opens in your browser. Describe the trip, or tap one of the examples to fill it in. Set the sliders if you like and press **Generate guide**. When it is done, download the guide from the same page.
 
-## Get started with Codex
+## Get started with Codex (beta)
 
 ### 1. Install
 
@@ -72,7 +72,7 @@ Start a new Codex session and type `$postcard`. In the ChatGPT app, type `@` and
 
 **Where guides are saved.** In the folder your agent is open in. With no folder open, they go to a `Postcard` folder in your home folder.
 
-**It takes a while.** Usually 15 to 30 minutes, because it actually researches the trip. The page shows a live estimate. Keep Claude Code or Codex open until it finishes.
+**It takes a while.** Usually 20 to 40 minutes, because it researches the trip and then checks its own work. The page shows a live estimate. Keep Claude Code or Codex open until it finishes.
 
 **Approvals in Claude.** With **Auto-approve safe steps** on, routine steps run without asking. These are web searches, reading pages and saving into your trips folder. Anything else shows up as an Allow or Deny pop-up on the same page. So does everything, if you switch the toggle off. No answer in 5 minutes counts as Deny.
 
@@ -80,10 +80,18 @@ Start a new Codex session and type `$postcard`. In the ChatGPT app, type `@` and
 
 **It stays on your computer.** The page only runs on your own machine, with a one-time link. Postcard does nothing outside a build or outside your trips folder.
 
-**The guide is one file.** Photos and fonts are built in. It works offline and you can email it as it is.
+**The guide is one file.** Photos and fonts are built in. It works offline and you can email it as it is. It comes with a calendar file for the day plans and booking deadlines, a list of sources with check dates, and a print layout that shows every tab.
+
+**Honest about what it checked.** A guide that was not fully fact-checked says so at the top. A verified one lists its sources.
+
+**Changing a guide.** Ask your agent to change it, for example "swap day 3" or "cut it to five days". It edits the plan and rebuilds the page.
 
 **Prefer chat?** Just tell your agent about the trip and it builds the guide without the form.
 
 **You need Python 3.** Everything else installs itself.
 
 **Getting updates.** In the Claude app, go to **Settings** and open **Plugins**, then Postcard, and click **Update**. In Codex, run `codex plugin marketplace upgrade`. Start a new session afterwards.
+
+## For contributors
+
+Run the tests with `python3 tests/run.py`. `CHANGELOG.md` lists what changed. The skill is in `skills/postcard`, the approval hook in `hooks`.

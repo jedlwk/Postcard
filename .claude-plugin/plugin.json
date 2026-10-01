@@ -1,7 +1,9 @@
 {
   "name": "postcard",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "Describe a trip in your own words. Claude Code researches it and builds a travel guide with photos, maps and a tab for every stop.",
-  "author": { "name": "jedlwk" },
+  "author": {
+    "name": "jedlwk"
+  },
   "repository": "https://github.com/jedlwk/Postcard"
 }
