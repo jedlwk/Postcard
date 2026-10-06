@@ -2,7 +2,7 @@
 
 Describe a trip in your own words and Postcard turns it into a travel guide. Every stop gets its own tab with day plans, where to stay and what is on. Real photos and maps are built in. It works with Claude Code and with Codex (Codex support is in beta), on your own plan, so there is no API key to set up.
 
-![The Postcard form: describe the trip, pick an example, set the sliders](docs/postcard-form.jpg)
+![The Postcard form: pick an example to see a real guide, then set the sliders](docs/postcard-form.jpg)
 
 ## Get started with Claude
 
@@ -40,7 +40,7 @@ Postcard's page opens. It says "from postcard · 1 skill", with tabs for **Overv
 
 ### 2. Make a guide
 
-Start a new Claude Code session and type `/postcard:postcard`. A page opens in your browser. Describe the trip, or tap one of the examples to fill it in. Set the sliders if you like and press **Generate guide**. When it is done, download the guide from the same page.
+Start a new Claude Code session and type `/postcard:postcard`. A page opens in your browser. Describe the trip, or tap an example to fill it in and see a real guide built from it. Set the sliders if you like and press **Generate guide**. When it is done, download the guide from the same page.
 
 ## Get started with Codex (beta)
 

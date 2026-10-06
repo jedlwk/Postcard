@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0
+
+- Examples now show a real guide on the right: pick one and the page fills in the trip and previews what Postcard built from it.
+- New examples taken from real guides: Seattle to the Rockies, Dolomites, Venice, Chongqing and Chengdu.
+
 ## 2.0.1
 
 MIT license added.
