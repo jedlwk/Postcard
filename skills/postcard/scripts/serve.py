@@ -9,14 +9,16 @@ relays approval requests from the hook, and serves the finished file.
 Binds to 127.0.0.1 only, checks the Host header, and every API call needs
 the per-session token that is only in the URL Claude opens.
 """
-import argparse, json, os, secrets, shutil, signal, socket, subprocess, sys, time
+import argparse, json, os, re, secrets, shutil, signal, socket, subprocess, sys, time
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import tripstate as ts
 
-APP = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'app', 'trip-form.html')
+APP_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'app')
+APP = os.path.join(APP_DIR, 'trip-form.html')
+EXAMPLES = os.path.join(APP_DIR, 'examples')
 MAX_LIFE = 8 * 3600          # a build never needs longer than this
 STALE_AFTER = 20 * 60        # no progress for this long: tell the page
 
@@ -42,12 +44,12 @@ class Handler(BaseHTTPRequestHandler):
         tok = self.headers.get('X-Token') or (q.get('token') or [''])[0]
         return secrets.compare_digest(tok, self.server.session['token'])
 
-    def _send(self, code, body, ctype='application/json'):
+    def _send(self, code, body, ctype='application/json', cache='no-store'):
         data = body if isinstance(body, bytes) else json.dumps(body).encode()
         self.send_response(code)
         self.send_header('Content-Type', ctype)
         self.send_header('Content-Length', str(len(data)))
-        self.send_header('Cache-Control', 'no-store')
+        self.send_header('Cache-Control', cache)
         self.end_headers()
         self.wfile.write(data)
 
@@ -65,6 +67,13 @@ class Handler(BaseHTTPRequestHandler):
         if u.path in ('/', '/index.html'):
             with open(APP, 'rb') as f:
                 return self._send(200, f.read(), 'text/html; charset=utf-8')
+        if u.path.startswith('/examples/'):
+            name = u.path[len('/examples/'):]
+            f = os.path.join(EXAMPLES, name)
+            if not re.fullmatch(r'[a-z0-9-]+\.html', name) or not os.path.isfile(f):
+                return self._send(404, {'error': 'not found'})
+            with open(f, 'rb') as fh:
+                return self._send(200, fh.read(), 'text/html; charset=utf-8', 'max-age=3600')
         if not self._token_ok(q):
             return self._send(403, {'error': 'token'})
         if u.path == '/api/state':

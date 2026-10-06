@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.0
+
+- The form now has 7 preloaded examples. Each fills in a detailed trip, flights, sliders and who is going, and shows the full guide on the right so you can scroll it.
+- Two long trips (16 days and 11 nights) and five short ones, all from real guides.
+- The local page serves the example guides itself, so they work offline.
+- Tests check every example has a guide and a complete preset.
+
 ## 2.1.0
 
 - Examples now show a real guide on the right: pick one and the page fills in the trip and previews what Postcard built from it.

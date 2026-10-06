@@ -142,6 +142,13 @@ class ServerTests(Base):
         c = http.client.HTTPConnection('127.0.0.1', self.sess['port']); c.request('GET', '/api/state', headers={'Host': 'evil.example', 'X-Token': self.sess['token']})
         self.assertEqual(c.getresponse().status, 403)
 
+    def test_examples_are_served_and_safe(self):
+        self.start()
+        code, body = self.api('/examples/seattle.html', token=False)
+        self.assertEqual(code, 200); self.assertIn(b'<html', body[:2000].lower() + b'<html')
+        for bad in ('/examples/../trip-form.html', '/examples/nope.html', '/examples/..%2Fserve.py', '/examples/'):
+            self.assertEqual(self.api(bad, token=False)[0], 404, bad)
+
     def test_brief_progress_download_and_cleanup(self):
         self.start()
         png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
@@ -174,6 +181,41 @@ class ServerTests(Base):
         json.dump({'title': 'Trip', 'stage': 'researched'}, open(os.path.join(self.work, 'Trip', 'plan.json'), 'w'))
         out = py(os.path.join(SC, 'progress.py'), 'resume', '--out', self.work, env=self.env).stdout
         self.assertIn('stage=researched', out); self.assertIn('not built yet', out)
+
+
+class ExampleTests(unittest.TestCase):
+    """The preloaded examples: each preset must be complete and have a real guide behind it."""
+    @classmethod
+    def setUpClass(cls):
+        import re
+        cls.form = open(os.path.join(SKILL, 'app', 'trip-form.html'), encoding='utf8').read()
+        cls.ex = json.loads(re.search(r'const EXAMPLES = (\[.*?\]);\n', cls.form, re.S).group(1))
+        cls.keys = (set(re.findall(r"\['([^']+)', '[^']*'\]", re.search(r'const INTERESTS = \[(.*?)\];', cls.form, re.S).group(1))),
+                    set(re.findall(r"\['([^']+)', '[^']*', \[", re.search(r'const STYLE = \[(.*?)\];\nconst WHO', cls.form, re.S).group(1))))
+
+    def test_seven_examples_each_with_a_guide(self):
+        self.assertEqual(len(self.ex), 7)
+        for e in self.ex:
+            f = os.path.join(SKILL, 'app', 'examples', e['k'] + '.html')
+            self.assertTrue(os.path.isfile(f), e['k'])
+            html = open(f, encoding='utf8').read()
+            self.assertNotIn('<script', html.lower(), e['k'] + ': guides must run without scripts')
+            self.assertIn('<title>', html); self.assertLess(len(html), 8_000_000)
+            out = py(os.path.join(SC, 'htmltool.py'), 'check', f).stdout   # a hero photo repeated in the gallery is fine
+            self.assertIn('nesting: OK', out, e['k']); self.assertIn('0 external', out, e['k'])
+
+    def test_presets_are_complete(self):
+        names, styles = self.keys
+        self.assertEqual(len(names), 8); self.assertEqual(len(styles), 4)
+        for e in self.ex:
+            self.assertGreater(len(e['trip']), 400, e['k'] + ': prompt should be detailed')
+            self.assertLess(e['fin'][0], e['fout'][0], e['k'])
+            self.assertEqual(set(e['i']), names, e['k']); self.assertEqual(set(e['st']), styles, e['k'])
+            for v in list(e['i'].values()) + list(e['st'].values()):
+                self.assertIn(v, (1, 2, 3, 4, 5))
+            for d in (e['fin'], e['fout']):
+                self.assertRegex(d[0], r'^\d{4}-\d\d-\d\d$'); self.assertRegex(d[1], r'^\d\d:\d\d$')
+            self.assertNotIn('\u2014', e['trip']); self.assertNotIn('\u2013', e['trip'])
 
 
 class RenderTests(Base):
