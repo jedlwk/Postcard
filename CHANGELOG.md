@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.1
+
+- Fewer sliders so the form is quicker to fill in: Cafés now sits under Food, and Shopping is gone (Markets covers it). Ten sliders instead of twelve.
+
 ## 2.2.0
 
 - The form now has 7 preloaded examples. Each fills in a detailed trip, flights, sliders and who is going, and shows the full guide on the right so you can scroll it.
