@@ -13,7 +13,7 @@ If the trip is not already described in chat, open the form.
 
 1. Run `python3 "SKILL_DIR/scripts/serve.py" start` as a normal foreground command. It returns at once, opens the form in the browser and prints the link and save folder. Show the link in case the browser did not open.
 2. Run `python3 "SKILL_DIR/scripts/progress.py" wait`. It prints the brief as JSON. On `WAITING`, run it again.
-3. Treat `brief_text` as the user's instructions. Raw fields: `trip` (their words), `fly_in` and `fly_out` (date, rough time), `interests` (1 skip to 5 love, 3 normal), `style` (Pace, Early starts, Hiking, Driving, 1 to 5), `travellers`, `attachments` (screenshot paths: open and read every one first, bookings in them are fixed).
+3. Treat `brief_text` as the user's instructions. Raw fields: `trip` (their words), `fly_in` and `fly_out` (date, rough time), `interests` (1 skip to 5 love, 3 normal), `style` (Pace including how early to start, Hiking, Driving, 1 to 5), `travellers`, `attachments` (screenshot paths: open and read every one first, bookings in them are fixed).
 
 **Ask questions only when blocked** (no usable dates, an ambiguous destination, flights that contradict each other). Ask at most 3, in chat, in one message. Otherwise choose sensibly and state the assumptions on the Overview tab.
 

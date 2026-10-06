@@ -206,7 +206,7 @@ class ExampleTests(unittest.TestCase):
 
     def test_presets_are_complete(self):
         names, styles = self.keys
-        self.assertEqual(len(names), 6); self.assertEqual(len(styles), 4)
+        self.assertEqual(len(names), 6); self.assertEqual(len(styles), 3)
         for e in self.ex:
             self.assertGreater(len(e['trip']), 400, e['k'] + ': prompt should be detailed')
             self.assertLess(e['fin'][0], e['fout'][0], e['k'])

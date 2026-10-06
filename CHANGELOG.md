@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.2
+
+- Early starts is now part of Pace. Nine sliders in all.
+
 ## 2.2.1
 
 - Fewer sliders so the form is quicker to fill in: Cafés now sits under Food, and Shopping is gone (Markets covers it). Ten sliders instead of twelve.
