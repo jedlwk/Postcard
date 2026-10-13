@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.0
+
+- Guides are short by default. A day is a lead and up to four bullets, and the checker enforces word budgets. Ask for more detail and the guide gets longer (`"depth": "full"`).
+- Swaps: a stretch with real alternatives holds each version. The reader picks one on the Overview and every tab follows. No script needed.
+- Days show driving hours, and each swap option shows its total.
+- New `references/plan-rules.md` with rules from real itineraries: swaps, driving limits, closing days, fixed windows.
+- A `plan.json` written before 3.0.0 needs `"depth": "full"` to render.
+
 ## 2.2.2
 
 - Early starts is now part of Pace. Nine sliders in all.

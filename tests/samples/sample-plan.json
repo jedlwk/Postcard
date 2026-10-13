@@ -1,5 +1,6 @@
 {
   "title": "Sample guide",
+  "depth": "full",
   "headline": "A sample guide, built from test data.",
   "eyebrow": "TEST DATA &middot; NOT TRAVEL ADVICE",
   "lede": "Four days across two made-up stops. This file exists so the renderer, the checker and the tabs can be tested. **None of the facts are real.**",

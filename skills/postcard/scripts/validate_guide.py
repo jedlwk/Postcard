@@ -62,6 +62,23 @@ def main():
     if 'id="p-overview"' not in doc:
         errs.append('no Overview panel')
 
+    # swaps: every group has one checked radio and a label per option, every data-sw tag points at a real option
+    sw_radios = re.findall(r'<input type="radio" name="(sw-[^"]+)" class="swradio" id="(sw-[^"]+)"( checked)?>', doc)
+    by_group = collections.defaultdict(list)
+    for name, rid, chk in sw_radios:
+        by_group[name].append((rid, bool(chk)))
+        if f'for="{rid}"' not in doc:
+            errs.append(f'swap option {rid} has no selector label')
+    for name, items in by_group.items():
+        if sum(1 for _, c in items if c) != 1:
+            errs.append(f'swap group {name} must have exactly one default option')
+    real = {rid for _, items in by_group.items() for rid, _ in items}
+    for tags in set(re.findall(r'data-sw="([^"]+)"', doc)):
+        for tag in tags.split():
+            g, _, o = tag.partition(':')
+            if f'sw-{re.sub(r"[^a-z0-9]+", "-", g.lower()).strip("-")}-{re.sub(r"[^a-z0-9]+", "-", o.lower()).strip("-")}' not in real:
+                errs.append(f'data-sw tag "{tag}" has no option')
+
     # in-page links
     ids = collections.Counter(re.findall(r'\sid="([^"]+)"', doc))
     for k, v in ids.items():
@@ -102,6 +119,19 @@ def main():
     text = visible_text(doc)
     low = text.lower()
 
+    # length: a plan, not an essay
+    plan_days = None
+    if a.plan and os.path.isfile(a.plan):
+        try:
+            pl = json.load(open(a.plan))
+            plan_days = (dt.date.fromisoformat(pl['end']) - dt.date.fromisoformat(pl['start'])).days + 1
+            lean = pl.get('depth') != 'full'
+        except Exception:
+            lean = True
+        if plan_days:
+            wpd = len(text.split()) / plan_days
+            if lean and wpd > 320:
+                warns.append(f'{wpd:.0f} words per trip day; a lean guide is under about 320. Cut')
     # placeholders and phrases
     for ph in ('lorem ipsum', 'todo', 'tbd', 'xxx', '[insert', 'placeholder'):
         if re.search(r'\b' + re.escape(ph), low) and 'test data' not in low:

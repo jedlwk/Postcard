@@ -910,6 +910,17 @@ details.more.src .src-row a{color:var(--ink);text-underline-offset:3px}
 details.more.src .src-row time{font-size:.72rem;color:var(--ink-faint);text-align:right}
 .cal-link{display:inline-block;margin-top:14px;font-size:.84rem;font-weight:600;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:8px 14px;text-decoration:none}
 .cal-link:hover{border-color:var(--ink-soft)}
+/* ===== swaps (pick a version of part of the plan) and drive chips ===== */
+.swradio{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+.swaps{margin:0 0 18px;display:flex;flex-direction:column;gap:14px}
+.swap-h{font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 6px}
+.swap-opts{display:flex;flex-wrap:wrap;gap:8px}
+.swap-opt{display:flex;flex-direction:column;gap:2px;flex:1 1 170px;min-width:0;padding:9px 13px 10px;border:1px solid var(--line);border-radius:10px;background:var(--paper);cursor:pointer;transition:background .15s,border-color .15s}
+.swap-opt:hover{border-color:var(--ink-faint)}
+.swap-opt b{font-size:.88rem;color:var(--ink);font-weight:600}
+.swap-opt span{font-size:.72rem;color:var(--ink-faint)}
+.day-drive{font-size:.66rem;color:var(--ink-faint);white-space:nowrap}
+.gl-drv{font-style:normal;font-size:.7rem;color:var(--ink-faint);margin-left:6px;white-space:nowrap}
 /* ===== print: show every tab, hide the chrome ===== */
 @media print{
   .tabradio,.tabbar,.p-next,.exs,.cal-link{display:none!important}

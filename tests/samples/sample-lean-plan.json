@@ -1,0 +1,37 @@
+{
+  "title": "Sample lean guide",
+  "headline": "A short plan with two ways to spend the middle.",
+  "eyebrow": "TEST DATA &middot; NOT TRAVEL ADVICE",
+  "lede": "Five days, two stops. Pick a version of the middle days. **None of the facts are real.**",
+  "start": "2027-10-08", "end": "2027-10-12",
+  "hero": {"image": "photos/hero.jpg", "alt": "Test image", "credit": "Generated test image, public domain"},
+  "verification": {"status": "unchecked"},
+  "swaps": [
+    {"id": "mid", "label": "Sat to Sun", "options": [
+      {"id": "coast", "name": "Coast road", "note": "Beaches, slow"},
+      {"id": "hills", "name": "Hill loop", "note": "Views, early start"}]}
+  ],
+  "book_check": [{"when": "Now", "text": "**Beds.** Book refundable rooms first."}],
+  "sources": [{"claim": "Hours are placeholders", "url": "https://example.com/hours", "checked": "2026-09-28"}],
+  "stops": [
+    {"id": "stop-a", "name": "Stop A, the first place", "tab": "Stop A", "tab_sub": "2 nights", "color": "s1", "sleep": "Old town",
+     "dates": "Fri&ndash;Sun, Oct 8&ndash;10, 2027 &middot; 2 nights",
+     "photos": [{"file": "photos/a1.jpg", "what": "A test photo", "where": "Somewhere", "credit": "Test image"}],
+     "days": [
+       {"date": "2027-10-08", "cat": "Arrival", "lead": "Land at **12:00** and walk the old town.", "bullets": ["Check in after 14:00"], "drive_h": 1},
+       {"date": "2027-10-09", "cat": "Nature", "lead": "Beaches and a long lunch.", "bullets": ["Low tide is at 09:00 {must}"], "drive_h": 2, "swap": "mid:coast"},
+       {"date": "2027-10-09", "cat": "Nature", "lead": "Up the hill before the crowds.", "bullets": ["Start by 07:00"], "drive_h": 3.5, "swap": "mid:hills"},
+       {"date": "2027-10-10", "cat": "Travel", "lead": "Slow morning, then on to Stop B.", "drive_h": 1.5, "sleep": "Hill town"}],
+     "stays": [
+       {"nights": "Fri &middot; Oct 8 &middot; 1 night", "base": "Old town", "why": "Walkable to everything."},
+       {"nights": "Sat &middot; Oct 9 &middot; 1 night", "base": "Harbour", "why": "Close to the beaches.", "swap": "mid:coast"},
+       {"nights": "Sat &middot; Oct 9 &middot; 1 night", "base": "Trailhead lodge", "why": "Start at the door.", "swap": "mid:hills"}],
+     "know": ["Cash is useful at small stalls."]},
+    {"id": "stop-b", "name": "Stop B, the second place", "tab": "Stop B", "tab_sub": "2 nights", "color": "s2", "sleep": "Hill town",
+     "dates": "Sun&ndash;Tue, Oct 10&ndash;12, 2027 &middot; 2 nights",
+     "photos": [{"file": "photos/b1.jpg", "what": "Test photo", "where": "Hill", "credit": "Test image"}],
+     "days": [
+       {"date": "2027-10-11", "cat": "Scenic", "lead": "Slow morning, then the viewpoint."},
+       {"date": "2027-10-12", "cat": "Travel", "lead": "Pack and fly home at **16:00**."}]}
+  ]
+}

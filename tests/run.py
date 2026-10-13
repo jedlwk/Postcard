@@ -272,6 +272,47 @@ class RenderTests(Base):
         open(gp, 'w').write(good.replace('Fri 8 Oct', 'Sat 8 Oct', 1))
         self.assertIn('weekday mismatch', self.validate().stdout)
 
+    def lean(self):
+        shutil.copy(os.path.join(ROOT, 'tests', 'samples', 'sample-lean-plan.json'), self.plan_path)
+        self.plan = json.load(open(self.plan_path))
+
+    def test_lean_plan_with_swaps(self):
+        self.lean()
+        r = py(os.path.join(SC, 'render_guide.py'), self.plan_path, env=self.env); self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        gp = os.path.join(self.trip, 'Sample lean guide.html')
+        v = py(os.path.join(SC, 'validate_guide.py'), gp, '--plan', self.plan_path, env=self.env); self.assertEqual(v.returncode, 0, v.stdout)
+        page = open(gp).read()
+        self.assertEqual(page.count('class="swradio"'), 2)
+        self.assertEqual(page.count('class="swradio" id="sw-mid-coast" checked'), 1)           # first option is the default
+        self.assertIn('#sw-mid-hills:checked ~ .panels [data-sw~="mid:coast"]{display:none}', page)
+        self.assertIn('data-sw="mid:hills"', page)
+        self.assertIn('2h00 driving', page); self.assertIn('3h30 driving', page)               # per day and per option
+        self.assertNotIn('<script', page)
+
+    def test_calendar_uses_default_swap_only(self):
+        self.lean(); self.render_lean = py(os.path.join(SC, 'render_guide.py'), self.plan_path, env=self.env)
+        ics = open(os.path.join(self.trip, 'Sample lean guide.ics')).read()
+        self.assertEqual(ics.count('BEGIN:VEVENT'), 5)                                         # one version of the swapped day
+        self.assertIn('Beaches and a long lunch', ics); self.assertNotIn('Up the hill', ics)
+
+    def test_lean_budgets_and_swap_tags_are_enforced(self):
+        self.lean()
+        chk = lambda p: (self.write(p), py(os.path.join(SC, 'render_guide.py'), self.plan_path, '--check', env=self.env))[1]
+        p = json.loads(json.dumps(self.plan)); p['stops'][0]['days'][0]['lead'] = ' '.join(['word'] * 20)
+        r = chk(p); self.assertEqual(r.returncode, 1); self.assertIn('too long', r.stdout)
+        p['depth'] = 'full'; self.assertEqual(chk(p).returncode, 0)                                   # full lifts the budgets
+        p = json.loads(json.dumps(self.plan)); p['stops'][0]['days'][1]['swap'] = 'mid:nope'
+        r = chk(p); self.assertEqual(r.returncode, 1); self.assertIn('unknown swap tag', r.stdout)
+        p = json.loads(json.dumps(self.plan)); p['stops'][0]['more'] = {'Food': [{'name': 'x'}]}
+        r = chk(p); self.assertEqual(r.returncode, 1); self.assertIn('left out of lean guides', r.stdout)
+
+    def test_validator_catches_broken_swaps(self):
+        self.lean(); self.render_lean = py(os.path.join(SC, 'render_guide.py'), self.plan_path, env=self.env)
+        gp = os.path.join(self.trip, 'Sample lean guide.html'); good = open(gp).read()
+        open(gp, 'w').write(good.replace('data-sw="mid:hills"', 'data-sw="mid:ghost"', 1))
+        r = py(os.path.join(SC, 'validate_guide.py'), gp, '--plan', self.plan_path, env=self.env)
+        self.assertEqual(r.returncode, 1); self.assertIn('has no option', r.stdout)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, warnings='ignore')

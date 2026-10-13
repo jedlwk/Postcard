@@ -1,11 +1,13 @@
 # plan.json
 
-The agent writes the content here. `render_guide.py` owns the layout. A complete example is `tests/samples/sample-plan.json`. Run `render_guide.py plan.json --check` to validate a plan without rendering.
+The agent writes the content here. `render_guide.py` owns the layout. Complete examples are `tests/samples/sample-lean-plan.json` (lean, with a swap) and `tests/samples/sample-plan.json` (full depth). Run `render_guide.py plan.json --check` to validate a plan without rendering.
 
 ## Contents
 - Inline text
 - Top level
 - A stop
+- Swaps
+- Word budgets
 - Overview and extra tabs
 - Paths
 
@@ -28,7 +30,7 @@ Entities such as `&ndash;` and `&amp;` are kept as written. Everything else is e
 
 | Field | Notes |
 |---|---|
-| `title`, `headline`, `lede` | page title, hero headline, one short paragraph |
+| `title`, `headline`, `lede` | page title, hero headline, a lede of up to 35 words |
 | `eyebrow` | optional small line above the headline (defaults to the stop names) |
 | `start`, `end` | ISO dates. Weekday labels are computed from these |
 | `hero` | `image`, `alt`, `credit` (required) |
@@ -43,6 +45,8 @@ Entities such as `&ndash;` and `&amp;` are kept as written. Everything else is e
 | `extras` | extra tabs: `id`, `name`, `sub`, `title`, `intro`, `cards` |
 | `footnote` | closing note, shown under the tabs |
 | `stage` | `researched`, `photos` or `built`. Lets a stopped build resume |
+| `depth` | leave out for a lean guide. `"full"` lifts the word budgets and allows `shortlist`, `more` and `reading` |
+| `swaps` | groups of alternative versions (see Swaps) |
 
 ## A stop
 
@@ -57,8 +61,8 @@ Entities such as `&ndash;` and `&amp;` are kept as written. Everything else is e
 | `alert` | `label`, `text`: a risk that lands on these dates |
 | `photos` | each: `file`, `what`, `where`, `credit` |
 | `map` | `file`, `caption`, `credit`, `source_url` (a real published map) |
-| `days` | each: `date` (ISO), `cat` (Arrival, Travel, Food, Nature, Culture, Festival, Scenic), `lead`, `bullets` |
-| `stays` | each: `nights`, `base`, `why`, `pick` (`name`, `text`), `alts` (`label`, `text`), `links` |
+| `days` | each: `date` (ISO), `cat` (Arrival, Travel, Food, Nature, Culture, Festival, Scenic), `lead`, `bullets`, optional `drive_h` (hours), `sleep`, `swap` |
+| `stays` | each: `nights`, `base`, `why`, `pick` (`name`, `text`, optional `tag`), `alts` (`label`, `text`), `links`, optional `swap` |
 | `know`, `cards` | plain lists for the side column (`cards` have a `title`) |
 | `festivals` | each: `tag` (`high`, `likely`, `uncertain`, `risk`), `text` |
 | `fun_fact` | one verified fact |
@@ -66,6 +70,36 @@ Entities such as `&ndash;` and `&amp;` are kept as written. Everything else is e
 | `shortlist` | `groups` of `spots` (`name`, `url`, `must`, `car`, `meta`, `why`) |
 | `more` | `Food`, `Markets`, `Nature`, `Culture`, `Nightlife`, `Festivals`, each a list of `name`, `why`, `area` |
 | `reading` | list of `label`, `src`, `url` |
+
+## Swaps
+
+A swap lets the reader pick a version of part of the plan. The first option is the default.
+
+```json
+"swaps": [{"id": "route", "label": "Monday night to Tuesday", "options": [
+  {"id": "east", "name": "East: Tacoma and the outlets", "note": "Point Defiance, outlets"},
+  {"id": "west", "name": "West: Hoh and the coast", "note": "Mosses, Ruby Beach"}]}]
+```
+
+Tag each day or stay in a version with `"swap": "route:east"` (a list tags several groups). Untagged days always show. Each option shows its total driving, summed from `drive_h` on the days it tags. The calendar file uses the default versions only.
+
+## Word budgets
+
+Checked by `render_guide.py --check` unless `depth` is `full`. Counts are visible words.
+
+| Where | Limit |
+|---|---|
+| `lede` | 35 words |
+| a day `lead` | 12 words |
+| `bullets` | 4 a day, 18 words each |
+| a stay `why`, `pick.text`, `alts` | 20, 22 words, 1 alt of 20 |
+| `know` | 3 items of 18 words |
+| `festivals` | 3 items of 20 words |
+| `hikes` | 3 items |
+| `cards`, `fun_fact` | 1 card, 20 words |
+| `risks` | 4 cards, 3 items each, 20 words each |
+| `book_check` | 8 items of 18 words |
+| a swap option `note` | 14 words |
 
 ## Overview and extra tabs
 

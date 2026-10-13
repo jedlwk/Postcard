@@ -16,7 +16,9 @@ Do this before writing the plan.
 - **Drive times.** Search every one. Remembered numbers run 30 to 50 percent too optimistic. A "2.5 to 3 hour" drive that was really 4 hours flipped a whole day's plan.
 - **Weather.** Real climate normals for the travel month, from a named source. Add a "feels like" range (wind chill at 10°C or below, humidex above).
 - **Places per stop.** Real, well reviewed places in Food, Markets, Nature, Culture, Nightlife and Festivals. Where a category is thin, say so.
-- **Opening days and booking.** The weekly closing day per site, and whether booking is essential. Then check the day plan against it, for example a market planned on its closed day.
+- **Opening days and booking.** The weekly closing day per site, and whether booking is essential. Then check the day plan against it, for example a market planned on its closed day. Many close Monday and Tuesday.
+- **Windows.** Gate queues, crowd peaks, tide times for coast stops, last entry, tolls. Put each on the day it matters.
+- **Alternatives.** For each long drive, find what is open on the way and the cost in hours. That is where swaps come from (see `plan-rules.md`).
 - **Stays.** Areas, not listings. Name a property only when it changes the day, like the only lodge inside a park.
 - **Rules and fees.** Entry permits, timed tickets, park fees, visa or eTA, with the date each was checked.
 

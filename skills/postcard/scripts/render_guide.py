@@ -9,6 +9,10 @@ The agent writes content into plan.json (see references/plan-schema.md).
 This script owns the layout: markup, tabs, colours, weekday labels, photo
 encoding, calendar link, print styles. Same plan, same page, every time.
 
+Lean by default: word budgets keep the guide short (see LEAN below). Set
+"depth": "full" in the plan to lift them. Parts of the plan that have real
+alternatives go in "swaps": the reader picks a version with no script.
+
 Inline text markup used in plan strings:
     **bold**  *italic*  [label](https://url)
     {must}  {book}  {michelin:star|bib|rec}  {car}
@@ -29,6 +33,11 @@ TAG_LABEL = {'high': 'HIGH CONFIDENCE', 'fixed': 'HIGH CONFIDENCE', 'likely': 'L
 TIER = {'must': ('Must-do', 't-must'), 'high': ('Highly recommended', 't-high'), 'good': ('Good to have', 't-good')}
 MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 WD = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+# Word budgets for a lean guide. Counts are of visible words, markup ignored.
+LEAN = {'lede': 35, 'lead': 12, 'bullets': 4, 'bullet': 18, 'why': 20, 'pick': 22, 'alt': 20, 'alts': 1, 'know': 3, 'know_item': 18,
+        'festivals': 3, 'festival': 20, 'hikes': 3, 'cards': 1, 'fun_fact': 20, 'risk_cards': 4, 'risk_items': 3, 'risk_item': 20,
+        'book_check': 8, 'book_item': 18, 'weather_notes': 2, 'note': 14}
+LEAN_OFF = ('shortlist', 'more', 'reading')   # left out of lean guides
 
 
 # ------------------------------------------------------------------ text
@@ -49,6 +58,28 @@ def md(s):
     t = re.sub(r'\{michelin:(star|bib|rec)\}', lambda m: {'star': '<span class="michelin-tag mstar">MICHELIN 1 Star</span>',
                'bib': '<span class="michelin-tag mbib">MICHELIN Bib Gourmand</span>', 'rec': '<span class="michelin-tag mrec">MICHELIN Recommended</span>'}[m.group(1)], t)
     return t
+
+
+def words(s):
+    t = re.sub(r'\[([^\]]+)\]\([^)]*\)', r'\1', str(s or ''))
+    t = re.sub(r'\{[a-z:]+\}|\*+|<[^>]+>', ' ', t)
+    t = re.sub(r'&\w+;', ' ', t)
+    return len(t.split())
+
+
+def fmt_h(h):
+    m = int(round(float(h) * 12)) * 5
+    return f'{m // 60}h{m % 60:02d}' if m >= 60 else f'{m} min'
+
+
+def swap_tags(x):
+    t = x.get('swap') or []
+    return [t] if isinstance(t, str) else list(t)
+
+
+def sw_attr(x):
+    t = swap_tags(x)
+    return f' data-sw="{esc(" ".join(t))}"' if t else ''
 
 
 def slug(s):
@@ -161,7 +192,88 @@ def check_plan(plan, base):
             warns.append('verified without a second pass (verification.second_pass)')
     elif not v.get('status'):
         warns.append('verification.status missing; the guide will say it is not fact-checked')
+    check_swaps(plan, errs, warns)
+    if plan.get('depth') != 'full':
+        check_lean(plan, errs)
     return errs, warns
+
+
+def check_swaps(plan, errs, warns):
+    groups = {g.get('id'): g for g in plan.get('swaps') or []}
+    for gid, g in groups.items():
+        opts = [o.get('id') for o in g.get('options') or []]
+        if not gid or len(opts) < 2:
+            errs.append(f'swap "{gid}": needs an id and at least 2 options')
+        if len(set(opts)) != len(opts) or not all(opts):
+            errs.append(f'swap "{gid}": option ids must be unique and non-empty')
+        used = set()
+        for st in plan.get('stops') or []:
+            for x in (st.get('days') or []) + (st.get('stays') or []):
+                used.update(t for t in swap_tags(x) if t.startswith(gid + ':'))
+        for o in opts:
+            if f'{gid}:{o}' not in used:
+                warns.append(f'swap "{gid}": option "{o}" is not used by any day or stay')
+    for st in plan.get('stops') or []:
+        for x in (st.get('days') or []) + (st.get('stays') or []):
+            for t in swap_tags(x):
+                gid, _, oid = t.partition(':')
+                if gid not in groups or oid not in [o.get('id') for o in groups[gid].get('options') or []]:
+                    errs.append(f'stop {st.get("name", "?")}: unknown swap tag "{t}"')
+
+
+def check_lean(plan, errs):
+    """Word budgets. The guide is a plan, not an essay."""
+    B = LEAN
+
+    def cap(text, n, where):
+        c = words(text)
+        if c > n:
+            errs.append(f'too long ({c} words, max {n}): {where}: "{str(text)[:50]}..."')
+
+    def count(lst, n, where):
+        if len(lst or []) > n:
+            errs.append(f'too many ({len(lst)}, max {n}): {where}')
+    cap(plan.get('lede', ''), B['lede'], 'lede')
+    for b in (plan.get('book_check') or []):
+        cap(b.get('text', ''), B['book_item'], 'book_check')
+    count(plan.get('book_check'), B['book_check'], 'book_check items')
+    count((plan.get('weather') or {}).get('notes'), B['weather_notes'], 'weather notes')
+    r = plan.get('risks') or {}
+    count(r.get('cards'), B['risk_cards'], 'risk cards')
+    for c in r.get('cards') or []:
+        count(c.get('items'), B['risk_items'], f'risk card "{c.get("title")}" items')
+        for it in c.get('items') or []:
+            cap(it, B['risk_item'], f'risk card "{c.get("title")}"')
+    for st in plan.get('stops') or []:
+        w = st.get('name', '?')
+        for d in st.get('days') or []:
+            cap(d.get('lead', ''), B['lead'], f'{w} {d.get("date")} lead')
+            count(d.get('bullets'), B['bullets'], f'{w} {d.get("date")} bullets')
+            for b in d.get('bullets') or []:
+                cap(b, B['bullet'], f'{w} {d.get("date")} bullet')
+        for s in st.get('stays') or []:
+            cap(s.get('why', ''), B['why'], f'{w} stay "{s.get("base")}" why')
+            if s.get('pick'):
+                cap(s['pick'].get('text', ''), B['pick'], f'{w} stay pick')
+            count(s.get('alts'), B['alts'], f'{w} stay alternatives')
+            for a in s.get('alts') or []:
+                cap(a.get('text', ''), B['alt'], f'{w} stay alternative')
+        count(st.get('know'), B['know'], f'{w} know items')
+        for k in st.get('know') or []:
+            cap(k, B['know_item'], f'{w} know item')
+        count(st.get('festivals'), B['festivals'], f'{w} festivals')
+        for f in st.get('festivals') or []:
+            cap(f.get('text', ''), B['festival'], f'{w} festival')
+        count((st.get('hikes') or {}).get('items'), B['hikes'], f'{w} hikes')
+        count(st.get('cards'), B['cards'], f'{w} extra cards')
+        if st.get('fun_fact'):
+            cap(st['fun_fact'], B['fun_fact'], f'{w} fun fact')
+        for k in LEAN_OFF:
+            if st.get(k):
+                errs.append(f'{w}: "{k}" is left out of lean guides (set "depth": "full" only if the user asked for more)')
+    for g in plan.get('swaps') or []:
+        for o in g.get('options') or []:
+            cap(o.get('note', ''), B['note'], f'swap option "{o.get("id")}" note')
 
 
 # ------------------------------------------------------------------ blocks
@@ -223,20 +335,40 @@ def gallery(st, base, sid):
             f'<figcaption>{md(m.get("caption", ""))} <span class="map-credit">Map: {esc(m["credit"])} &middot; <a href="{esc(m["source_url"])}" target="_blank" rel="noopener">source</a></span></figcaption></figure></div></div>')
 
 
+def swap_bar(plan, only=None):
+    """One selector per swap group: radio inputs live at page level, so no script is needed."""
+    out = []
+    for g in plan.get('swaps') or []:
+        if only is not None and g['id'] not in only:
+            continue
+        opts = []
+        for o in g['options']:
+            tag = f'{g["id"]}:{o["id"]}'
+            h = sum(float(d.get('drive_h') or 0) for st in plan['stops'] for d in st['days'] if tag in swap_tags(d))
+            bits = [esc(o.get('note', ''))] if o.get('note') else []
+            if h:
+                bits.append(f'{fmt_h(h)} driving')
+            opts.append(f'<label class="swap-opt" for="sw-{slug(g["id"])}-{slug(o["id"])}"><b>{esc(o["name"])}</b><span>{" &middot; ".join(bits)}</span></label>')
+        out.append(f'<div class="swap"><div class="swap-h mono">{esc(g.get("label", g["id"]))}</div><div class="swap-opts">{"".join(opts)}</div></div>')
+    return f'<div class="swaps">{"".join(out)}</div>' if out else ''
+
+
 def day_item(d):
     dd = pdate(d['date'])
     cat = DAY_CAT.get(str(d.get('cat', 'nature')).lower(), 'nature')
     bullets = f'<ul class="day-highlights">{li(d.get("bullets", []))}</ul>' if d.get('bullets') else ''
-    return (f'<div class="day-item"><div class="day-tag"><span class="mono">{dlabel(dd)}</span><span class="day-cat" style="background:var(--cat-{cat}-tint); color:var(--cat-{cat})">{esc(d.get("cat", ""))}</span></div>'
+    drive = f'<span class="day-drive mono">{fmt_h(d["drive_h"])} driving</span>' if d.get('drive_h') else ''
+    return (f'<div class="day-item"{sw_attr(d)}><div class="day-tag"><span class="mono">{dlabel(dd)}</span><span class="day-cat" style="background:var(--cat-{cat}-tint); color:var(--cat-{cat})">{esc(d.get("cat", ""))}</span>{drive}</div>'
             f'<div class="day-text"><span class="day-lead">{md(d["lead"])}</span>{bullets}</div></div>')
 
 
 def stay_card(s, c):
+    sw = sw_attr(s)
     pick = (f'<p class="stay-pick"><span class="book-tag">{esc(s["pick"].get("tag", "BOOK THIS"))}</span> <strong>{md(s["pick"]["name"])}</strong>: {md(s["pick"]["text"])}</p>' if s.get('pick') else '')
     alts = ''.join(f'<p class="stay-alt"><strong>{esc(a["label"])}:</strong> {md(a["text"])}</p>' for a in s.get('alts', []))
     links = ''.join(f'<a href="{esc(l["url"])}" target="_blank" rel="noopener">&#8599; {esc(l["label"])}</a>' for l in s.get('links', []))
     links = f'<div class="stay-links">{links}</div>' if links else ''
-    return (f'<div class="stay-card" style="border-left-color:var(--{c})"><div class="stay-nights mono">{esc(s["nights"])}</div><div class="stay-base">{md(s["base"])}</div>'
+    return (f'<div class="stay-card"{sw} style="border-left-color:var(--{c})"><div class="stay-nights mono">{esc(s["nights"])}</div><div class="stay-base">{md(s["base"])}</div>'
             f'<p class="stay-why">{md(s.get("why", ""))}</p>{pick}{alts}{links}</div>')
 
 
@@ -305,8 +437,10 @@ def more_block(st, sid):
     return f'<details class="more"><summary><span>More places and reading</span><span class="more-n mono">{note}</span></summary>{exp}{fr}</details>'
 
 
-def stop_panel(st, i, nxt, base):
+def stop_panel(st, i, nxt, base, plan=None):
     sid = slug(st['id']); c = color(st.get('color'))
+    here = {t.split(':')[0] for x in st['days'] + (st.get('stays') or []) for t in swap_tags(x)}
+    bar_swap = swap_bar(plan, here) if plan and here else ''
     b = st.get('badges') or {}
     badges = ''
     if b:
@@ -336,7 +470,7 @@ def stop_panel(st, i, nxt, base):
     nx = f'<a class="p-next" href="#top"><label for="t-{nxt[0]}">Next: {esc(nxt[1])} &rarr;</label></a>' if nxt else ''
     return (f'<section class="panel" id="p-{sid}"><div class="p-head"><div class="chapter-head"><span class="chapter-tag" style="color:var(--{c})">Stop {i}</span><h2>{esc(st["name"])}</h2></div>'
             f'<div class="chapter-dates">{esc(st["dates"])}</div><div class="p-meta">{badges}{mlink}</div></div>{alert}{gallery(st, base, sid)}'
-            f'<div class="p-grid"><div class="p-main"><h3 class="blk-h">Day by day</h3><div class="day-list">{days}</div></div><aside class="p-side">{side}</aside></div>'
+            f'<div class="p-grid"><div class="p-main"><h3 class="blk-h">Day by day</h3>{bar_swap}<div class="day-list">{days}</div></div><aside class="p-side">{side}</aside></div>'
             f'{hikes(st["hikes"]) if st.get("hikes") else ""}{shortlist(st["shortlist"]) if st.get("shortlist") else ""}{more_block(st, sid)}{nx}</section>')
 
 
@@ -360,8 +494,12 @@ def ics_text(plan):
         if desc:
             lines.append(f'DESCRIPTION:{esc_i(desc)}')
         lines.append('END:VEVENT'); ev.append('\r\n'.join(lines))
+    default = {f'{g["id"]}:{g["options"][0]["id"]}' for g in plan.get('swaps') or []}
+    allopts = {f'{g["id"]}:{o["id"]}' for g in plan.get('swaps') or [] for o in g['options']}
     for st in plan.get('stops', []):
         for d in st.get('days', []):
+            if any(t in allopts and t not in default for t in swap_tags(d)):
+                continue
             add(f'day-{d["date"]}-{slug(st["id"])}', d['date'], f'{st["name"]}: {re.sub(r"[*{}]", "", d["lead"])}', '\n'.join(re.sub(r'[*{}]', '', b) for b in d.get('bullets', [])))
     for n, f in enumerate(plan.get('flights', [])):
         if f.get('start'):
@@ -403,11 +541,15 @@ def render(plan, base):
     for si, st in enumerate(stops):
         c = color(st.get('color'))
         for d in st['days']:
-            rows.append((d['date'], c, slug(st['id']), re.sub(r'[*{}]', '', d['lead']), d.get('sleep') or st.get('sleep', '')))
+            drv = f' <i class="gl-drv">{fmt_h(d["drive_h"])} driving</i>' if d.get('drive_h') else ''
+            rows.append((d['date'], c, slug(st['id']), re.sub(r'[*{}]', '', d['lead']), d.get('sleep') or st.get('sleep', ''), sw_attr(d), drv))
     rows.sort(key=lambda r: r[0])
     glance = ('<div class="glance"><div class="gl-head mono"><span>Date</span><span></span><span>Plan</span><span>Sleep</span></div>' + ''.join(
-        f'<label class="gl-row" for="t-{sid}"><span class="gl-d mono">{dlabel(pdate(d))}</span><span class="gl-dot" style="background:var(--{c})"></span><span class="gl-what">{esc(w)}</span><span class="gl-sleep mono">{esc(sl)}</span></label>'
-        for d, c, sid, w, sl in rows) + '</div>')
+        f'<label class="gl-row"{sw} for="t-{sid}"><span class="gl-d mono">{dlabel(pdate(d))}</span><span class="gl-dot" style="background:var(--{c})"></span><span class="gl-what">{esc(w)}{drv}</span><span class="gl-sleep mono">{esc(sl)}</span></label>'
+        for d, c, sid, w, sl, sw, drv in rows) + '</div>')
+    ov_swaps = ''
+    if plan.get('swaps'):
+        ov_swaps = '<p class="blk-sub">Pick a version of each part. The table and the tabs follow.</p>' + swap_bar(plan)
     ics = ics_text(plan)
     cal = f'<a class="cal-link" download="{slug(plan["title"])}.ics" href="data:text/calendar;base64,{base64.b64encode(ics.encode()).decode()}">Add the plan and deadlines to your calendar</a>'
     bc = plan.get('book_check') or []
@@ -429,22 +571,32 @@ def render(plan, base):
         src_html = f'<details class="more src"><summary><span>Sources and recheck dates</span><span class="more-n mono">{len(srcs)} sources</span></summary><div class="src-list">{rows_s}</div></details>'
     w = plan.get('weather')
     r = plan.get('risks')
-    overview = (f'<section class="panel" id="p-overview">{banner}<div class="ov-grid"><div><h3 class="blk-h">The trip, day by day</h3><p class="blk-sub">Tap a row to open that stop.</p>{glance}</div>'
+    overview = (f'<section class="panel" id="p-overview">{banner}<div class="ov-grid"><div><h3 class="blk-h">The trip, day by day</h3><p class="blk-sub">Tap a row to open that stop.</p>{ov_swaps}{glance}</div>'
                 f'<aside class="p-side">{todo}</aside></div>{weather(w) if w else ""}'
                 f'{section(r.get("tag", "Risks"), r["title"], r.get("intro", ""), r["cards"], sid="risks") if r else ""}{src_html}'
                 f'<a class="p-next" href="#top"><label for="t-{tabs[1][0]}">Start: {esc(tabs[1][1])} &rarr;</label></a></section>')
     panels = [overview]
     for i, st in enumerate(stops, 1):
         nxt = (tabs[i + 1][0], tabs[i + 1][1]) if i + 1 < len(tabs) else None
-        panels.append(stop_panel(st, i, nxt, base))
+        panels.append(stop_panel(st, i, nxt, base, plan))
     for j, ex in enumerate(extras):
         k = len(stops) + 1 + j
         nxt = f'<a class="p-next" href="#top"><label for="t-{tabs[k + 1][0]}">Next: {esc(tabs[k + 1][1])} &rarr;</label></a>' if k + 1 < len(tabs) else ''
         panels.append(f'<section class="panel" id="p-{slug(ex["id"])}">{section(ex.get("tag", ex["name"]), ex.get("title", ex["name"]), ex.get("intro", ""), ex["cards"])}{nxt}</section>')
     radios = ''.join(f'<input type="radio" name="tab" class="tabradio" id="t-{k}"{" checked" if n == 0 else ""}>' for n, (k, _, _, _) in enumerate(tabs))
+    swcss = ''
+    for g in plan.get('swaps') or []:
+        gid = slug(g['id'])
+        for n, o in enumerate(g['options']):
+            radios += f'<input type="radio" name="sw-{gid}" class="swradio" id="sw-{gid}-{slug(o["id"])}"{" checked" if n == 0 else ""}>'
+            for o2 in g['options']:
+                if o2 is not o:
+                    swcss += f'#sw-{gid}-{slug(o["id"])}:checked ~ .panels [data-sw~="{g["id"]}:{o2["id"]}"]{{display:none}}'
+            swcss += f'#sw-{gid}-{slug(o["id"])}:checked ~ .panels .swap-opt[for=sw-{gid}-{slug(o["id"])}]{{background:var(--paper-raised);border-color:var(--ink);box-shadow:inset 0 -3px 0 var(--ink)}}'
     bar = '<span id="top" class="tabs-anchor"></span><nav class="tabbar" aria-label="Sections">' + ''.join(
         f'<label for="t-{k}" style="--c:var(--{c if c != "ink" else "ink"})"><span class="tb-name">{esc(n)}</span><span class="tb-sub mono">{esc(s)}</span></label>' for k, n, c, s in tabs) + '</nav>'
     tabcss = ''.join(f'#t-{k}:checked ~ .panels #p-{k}{{display:block}}#t-{k}:checked ~ .tabbar label[for=t-{k}]{{background:var(--paper-raised);border-color:var(--c);box-shadow:inset 0 -3px 0 var(--c)}}' for k, _, _, _ in tabs)
+    tabcss += swcss
     ncol = len(tabs)
     tabcss += f'.tabbar{{grid-template-columns:repeat({ncol},minmax(0,1fr))}}'
     foot = f'<div class="foot-note"><p>{md(plan["footnote"])}</p></div>' if plan.get('footnote') else ''

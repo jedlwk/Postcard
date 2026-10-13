@@ -11,8 +11,8 @@
 `scripts/render_guide.py plan.json` writes one self-contained HTML file (fonts and photos embedded, no scripts) plus a calendar file. The CSS and fonts live in `templates/`. Do not hand-write markup. Change the plan or the template.
 
 - **Top:** cover photo, route strip, then a sticky tab bar.
-- **Overview tab:** day-by-day table (each row opens its stop), a dated "book and check" list with a calendar link, weather, risks, sources, and a banner if the guide is not fully verified.
-- **One tab per stop:** header, photos with the map beside them, "Day by day" next to a side column (where to stay, know before you go, festivals, fun fact), hikes, an optional shortlist, and the longer places list folded into a block.
+- **Overview tab:** the swap selectors, a day-by-day table with driving hours (each row opens its stop), a dated "book and check" list with a calendar link, risks, sources, and a banner if the guide is not fully verified. Weather is optional.
+- **One tab per stop:** header, photos with the map beside them, the swap selectors that affect the stop, then "Day by day" next to a side column (where to stay, know before you go). Hikes, a shortlist and a longer places list only appear in full guides.
 - **Extra tabs:** layover, logistics or anything else, as cards.
 - **Print:** every tab prints, the tab bar and carousels are hidden.
 
@@ -20,7 +20,7 @@
 
 - Warm paper palette, one accent colour per stop (`s1` to `s8`), a separate colour per place category, and a confidence tag for dates.
 - Light and dark mode come from the template. If you add a colour token, add it to the light root and both dark blocks.
-- Tabs are CSS only: radio inputs, labels and `:checked` rules. Panels and radios must stay siblings of the tab bar. Day rows in the Overview are labels for the same radios.
+- Tabs and swaps are CSS only: radio inputs, labels and `:checked` rules. Panels and radios must stay siblings of the tab bar. Day rows in the Overview are labels for the same radios. A swap hides the other versions with `data-sw` attribute rules, so print and the calendar need no script.
 - Write short, specific text. Few dashes, no filler, no notes about how the guide was made.
 
 ## Editing a guide
