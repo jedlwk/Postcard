@@ -149,6 +149,20 @@ class ServerTests(Base):
         for bad in ('/examples/../trip-form.html', '/examples/nope.html', '/examples/..%2Fserve.py', '/examples/'):
             self.assertEqual(self.api(bad, token=False)[0], 404, bad)
 
+    def test_start_replaces_a_server_from_another_version(self):
+        self.start()
+        s = json.load(open(os.path.join(self.home, '.postcard', 'session.json'))); old_pid = s['pid']
+        s['skill_root'] = '/somewhere/else/postcard/2.0.0/skills/postcard'
+        json.dump(s, open(os.path.join(self.home, '.postcard', 'session.json'), 'w'))
+        r = py(os.path.join(SC, 'serve.py'), 'start', '--out', self.work, env=self.env, timeout=30)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        new = json.load(open(os.path.join(self.home, '.postcard', 'session.json')))
+        self.assertNotEqual(new['pid'], old_pid); self.assertEqual(new['skill_root'], SKILL)
+        try:
+            os.kill(new['pid'], 15)
+        except OSError:
+            pass
+
     def test_brief_progress_download_and_cleanup(self):
         self.start()
         png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='

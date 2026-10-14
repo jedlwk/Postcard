@@ -1,6 +1,6 @@
 {
   "name": "postcard",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Describe a trip in your own words. Your agent builds a short, tabbed plan with photos and maps, and lets you swap parts of it.",
   "author": {
     "name": "jedlwk"

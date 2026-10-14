@@ -179,6 +179,18 @@ def launch(out):
     ts.ensure()
     ts.ensure_pillow()
     old = ts.active_session()
+    mine = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if old and old.get('skill_root') != mine and not os.path.exists(ts.BRIEF):
+        # A server left over from another plugin version would serve that version's form. Replace it.
+        try:
+            os.kill(int(old['pid']), signal.SIGTERM)
+            for _ in range(30):
+                if not ts.pid_alive(old.get('pid')):
+                    break
+                time.sleep(0.1)
+        except Exception:
+            pass
+        old = ts.active_session()
     if old:
         url = f'http://127.0.0.1:{old["port"]}/#t={old["token"]}'
     else:

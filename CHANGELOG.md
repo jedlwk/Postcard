@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.4
+
+- Starting the form now replaces a server left over from another plugin version, so you always see the version you installed.
+
 ## 3.0.3
 
 - The plugin description no longer names Claude Code and now mentions swaps.
