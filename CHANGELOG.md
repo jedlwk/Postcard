@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1
+
+- The first example is now Olympic to Seattle, built in the new short format with swaps. Pick it in the form and try the selectors in the preview.
+
 ## 3.0.0
 
 - Guides are short by default. A day is a lead and up to four bullets, and the checker enforces word budgets. Ask for more detail and the guide gets longer (`"depth": "full"`).

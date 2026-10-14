@@ -144,7 +144,7 @@ class ServerTests(Base):
 
     def test_examples_are_served_and_safe(self):
         self.start()
-        code, body = self.api('/examples/seattle.html', token=False)
+        code, body = self.api('/examples/olympic.html', token=False)
         self.assertEqual(code, 200); self.assertIn(b'<html', body[:2000].lower() + b'<html')
         for bad in ('/examples/../trip-form.html', '/examples/nope.html', '/examples/..%2Fserve.py', '/examples/'):
             self.assertEqual(self.api(bad, token=False)[0], 404, bad)
