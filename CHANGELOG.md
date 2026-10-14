@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2
+
+- The example preview is now a tall panel pinned to the right 40% of the page, for the whole page height. It stays in view while you scroll the form. Below 560 px wide it is hidden.
+
 ## 3.0.1
 
 - The first example is now Olympic to Seattle, built in the new short format with swaps. Pick it in the form and try the selectors in the preview.
