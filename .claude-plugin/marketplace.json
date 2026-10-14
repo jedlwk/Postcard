@@ -2,6 +2,6 @@
   "name": "postcard",
   "owner": { "name": "jedlwk" },
   "plugins": [
-    { "name": "postcard", "source": "./", "description": "Describe a trip; get a photo-rich, tabbed HTML travel guide." }
+    { "name": "postcard", "source": "./", "description": "Describe a trip in your own words. Your agent builds a short, tabbed plan with photos and maps, and lets you swap parts of it." }
   ]
 }

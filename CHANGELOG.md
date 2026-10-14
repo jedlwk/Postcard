@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.3
+
+- The plugin description no longer names Claude Code and now mentions swaps.
+
 ## 3.0.2
 
 - The example preview is now a tall panel pinned to the right 40% of the page, for the whole page height. It stays in view while you scroll the form. Below 560 px wide it is hidden.
