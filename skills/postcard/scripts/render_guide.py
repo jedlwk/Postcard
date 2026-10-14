@@ -471,6 +471,10 @@ def more_block(st, sid):
 def stop_panel(st, i, nxt, base, plan=None, nx_html=None, numbered=True):
     sid = slug(st['id']); c = color(st.get('color'))
     here = {t.split(':')[0] for x in st['days'] + (st.get('stays') or []) for t in swap_tags(x)}
+    for g in (plan or {}).get('swaps') or []:           # an order swap is only shown on stops that actually move
+        pos = {tuple(o['tabs']).index(st['id']) for o in g['options'] if 'tabs' in o and st['id'] in o['tabs']}
+        if any('tabs' in o for o in g['options']) and len(pos) <= 1:
+            here.discard(g['id'])
     bar_swap = swap_bar(plan, here) if plan and here else ''
     b = st.get('badges') or {}
     badges = ''

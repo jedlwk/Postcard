@@ -339,6 +339,9 @@ class RenderTests(Base):
         self.assertIn('#sw-order-bac:checked ~ .tabbar label[for=t-stop-b]{order:1}', page)      # tabs reorder
         self.assertIn('#sw-order-bac:checked ~ .route-strip [data-sw~="order:abc"]{display:none}', page)  # route follows
         self.assertIn('class="chapter-dates" data-sw="order:bac"', page)                         # dates per order
+        c = page[page.index('id="p-stop-c"'):]
+        self.assertNotIn('class="swaps"', c)                                                     # the last stop is fixed, so no selector
+        self.assertIn('class="swaps"', page[page.index('id="p-stop-a"'):page.index('id="p-stop-b"')])
         self.assertNotIn('>Stop 1<', page)                                                       # no numbering when order can change
         self.assertIn('data-sw="order:bac"><label for="t-stop-c">Next: Stop C', page)           # next link per order
         p = json.loads(json.dumps(self.plan)); p['swaps'][0]['options'][1]['tabs'] = ['stop-b', 'stop-c']; self.write(p)

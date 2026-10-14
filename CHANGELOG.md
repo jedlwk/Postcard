@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.2
+
+- The order selector only shows on stops that move. A stop that is last in every order, like Seattle, no longer shows it.
+
 ## 3.2.1
 
 - All seven example previews are rebuilt in the short format, with mixed day tags and driving hours.
