@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.5
+
+- The example preview now takes half the page (50%).
+
 ## 3.0.4
 
 - Starting the form now replaces a server left over from another plugin version, so you always see the version you installed.
