@@ -327,6 +327,22 @@ class RenderTests(Base):
         r = py(os.path.join(SC, 'validate_guide.py'), gp, '--plan', self.plan_path, env=self.env)
         self.assertEqual(r.returncode, 1); self.assertIn('has no option', r.stdout)
 
+    def test_block_order_swap(self):
+        shutil.copy(os.path.join(ROOT, 'tests', 'samples', 'sample-blocks-plan.json'), self.plan_path)
+        self.plan = json.load(open(self.plan_path))
+        r = py(os.path.join(SC, 'render_guide.py'), self.plan_path, env=self.env); self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        gp = os.path.join(self.trip, 'Sample block guide.html')
+        v = py(os.path.join(SC, 'validate_guide.py'), gp, '--plan', self.plan_path, env=self.env); self.assertEqual(v.returncode, 0, v.stdout)
+        page = open(gp).read()
+        self.assertIn('#sw-order-bac:checked ~ .tabbar label[for=t-stop-b]{order:1}', page)      # tabs reorder
+        self.assertIn('#sw-order-bac:checked ~ .route-strip [data-sw~="order:abc"]{display:none}', page)  # route follows
+        self.assertIn('class="chapter-dates" data-sw="order:bac"', page)                         # dates per order
+        self.assertNotIn('>Stop 1<', page)                                                       # no numbering when order can change
+        self.assertIn('data-sw="order:bac"><label for="t-stop-c">Next: Stop C', page)           # next link per order
+        p = json.loads(json.dumps(self.plan)); p['swaps'][0]['options'][1]['tabs'] = ['stop-b', 'stop-c']; self.write(p)
+        r = py(os.path.join(SC, 'render_guide.py'), self.plan_path, '--check', env=self.env)
+        self.assertEqual(r.returncode, 1); self.assertIn('must list every stop id', r.stdout)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2, warnings='ignore')

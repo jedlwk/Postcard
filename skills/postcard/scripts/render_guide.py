@@ -82,6 +82,17 @@ def sw_attr(x):
     return f' data-sw="{esc(" ".join(t))}"' if t else ''
 
 
+def sw_val(val, cls, tag='div'):
+    """A string, or {swap tag: string}: one element per version, shown by the selected swap."""
+    if isinstance(val, dict):
+        return ''.join(f'<{tag} class="{cls}" data-sw="{esc(k)}">{esc(v)}</{tag}>' for k, v in val.items())
+    return f'<{tag} class="{cls}">{esc(val)}</{tag}>'
+
+
+def first_val(val):
+    return next(iter(val.values())) if isinstance(val, dict) else val
+
+
 def slug(s):
     return re.sub(r'[^a-z0-9]+', '-', str(s).lower()).strip('-') or 'x'
 
@@ -213,6 +224,22 @@ def check_swaps(plan, errs, warns):
         for o in opts:
             if f'{gid}:{o}' not in used:
                 warns.append(f'swap "{gid}": option "{o}" is not used by any day or stay')
+    ids = [st.get('id') for st in plan.get('stops') or []]
+    for gid, g in groups.items():
+        for o in g.get('options') or []:
+            if 'tabs' in o and sorted(o['tabs']) != sorted(ids):
+                errs.append(f'swap "{gid}" option "{o.get("id")}": "tabs" must list every stop id once ({", ".join(ids)})')
+    valid = {f'{gid}:{o.get("id")}' for gid, g in groups.items() for o in g.get('options') or []}
+    for st in plan.get('stops') or []:
+        for k in ('dates', 'tab_sub'):
+            if isinstance(st.get(k), dict):
+                for t in st[k]:
+                    if t not in valid:
+                        errs.append(f'stop {st.get("name", "?")}: "{k}" has unknown swap tag "{t}"')
+    for r in plan.get('route') or []:
+        for t in swap_tags(r):
+            if t not in valid:
+                errs.append(f'route: unknown swap tag "{t}"')
     for st in plan.get('stops') or []:
         for x in (st.get('days') or []) + (st.get('stays') or []):
             for t in swap_tags(x):
@@ -437,7 +464,7 @@ def more_block(st, sid):
     return f'<details class="more"><summary><span>More places and reading</span><span class="more-n mono">{note}</span></summary>{exp}{fr}</details>'
 
 
-def stop_panel(st, i, nxt, base, plan=None):
+def stop_panel(st, i, nxt, base, plan=None, nx_html=None, numbered=True):
     sid = slug(st['id']); c = color(st.get('color'))
     here = {t.split(':')[0] for x in st['days'] + (st.get('stays') or []) for t in swap_tags(x)}
     bar_swap = swap_bar(plan, here) if plan and here else ''
@@ -467,9 +494,10 @@ def stop_panel(st, i, nxt, base, plan=None):
         side += f'<div class="info-card"><h4>Festivals &amp; Events</h4><ul class="fest-list">{fl}</ul></div>'
     if st.get('fun_fact'):
         side += f'<div class="info-card funfact"><h4>Fun Fact</h4><p>{md(st["fun_fact"])}</p></div>'
-    nx = f'<a class="p-next" href="#top"><label for="t-{nxt[0]}">Next: {esc(nxt[1])} &rarr;</label></a>' if nxt else ''
-    return (f'<section class="panel" id="p-{sid}"><div class="p-head"><div class="chapter-head"><span class="chapter-tag" style="color:var(--{c})">Stop {i}</span><h2>{esc(st["name"])}</h2></div>'
-            f'<div class="chapter-dates">{esc(st["dates"])}</div><div class="p-meta">{badges}{mlink}</div></div>{alert}{gallery(st, base, sid)}'
+    nx = nx_html if nx_html is not None else (f'<a class="p-next" href="#top"><label for="t-{nxt[0]}">Next: {esc(nxt[1])} &rarr;</label></a>' if nxt else '')
+    chap = f'<span class="chapter-tag" style="color:var(--{c})">Stop {i}</span>' if numbered else ''
+    return (f'<section class="panel" id="p-{sid}"><div class="p-head"><div class="chapter-head">{chap}<h2>{esc(st["name"])}</h2></div>'
+            f'{sw_val(st["dates"], "chapter-dates")}<div class="p-meta">{badges}{mlink}</div></div>{alert}{gallery(st, base, sid)}'
             f'<div class="p-grid"><div class="p-main"><h3 class="blk-h">Day by day</h3>{bar_swap}<div class="day-list">{days}</div></div><aside class="p-side">{side}</aside></div>'
             f'{hikes(st["hikes"]) if st.get("hikes") else ""}{shortlist(st["shortlist"]) if st.get("shortlist") else ""}{more_block(st, sid)}{nx}</section>')
 
@@ -511,12 +539,35 @@ def ics_text(plan):
 
 
 # ------------------------------------------------------------------ page
+def start_links(plan, tabs, order_groups, tab_name):
+    if not order_groups:
+        return f'<a class="p-next" href="#top"><label for="t-{tabs[1][0]}">Start: {esc(tabs[1][1])} &rarr;</label></a>'
+    g = order_groups[0]
+    return ''.join(f'<a class="p-next" href="#top" data-sw="{esc(g["id"])}:{esc(o["id"])}"><label for="t-{slug(o["tabs"][0])}">Start: {esc(tab_name[slug(o["tabs"][0])])} &rarr;</label></a>' for o in g['options'] if 'tabs' in o)
+
+
+def next_links(plan, k, tabs, order_groups, tab_name, extra_ids):
+    """The 'Next' link under a stop tab. With an order swap each order has its own next stop."""
+    g = order_groups[0]
+    out = []
+    for o in g['options']:
+        if 'tabs' not in o:
+            continue
+        seq = [slug(x) for x in o['tabs']] + extra_ids
+        j = seq.index(k)
+        if j + 1 < len(seq):
+            out.append(f'<a class="p-next" href="#top" data-sw="{esc(g["id"])}:{esc(o["id"])}"><label for="t-{seq[j + 1]}">Next: {esc(tab_name[seq[j + 1]])} &rarr;</label></a>')
+    return ''.join(out)
+
+
 def render(plan, base):
     stops = plan['stops']
     extras = plan.get('extras') or []
     tabs = [('overview', 'Overview', 'ink', f'{dlabel(pdate(plan["start"]))} to {dlabel(pdate(plan["end"]))}')]
     for st in stops:
         tabs.append((slug(st['id']), st.get('tab', st['name'].split(',')[0]), color(st.get('color')), st.get('tab_sub', '')))
+    order_groups = [g for g in plan.get('swaps') or [] if any('tabs' in o for o in g['options'])]
+    tab_name = {k: n for k, n, _, _ in tabs}
     for ex in extras:
         tabs.append((slug(ex['id']), ex['name'], color(ex.get('color', 's7')), ex.get('sub', '')))
     hero = plan['hero']
@@ -524,10 +575,10 @@ def render(plan, base):
     # route strip
     route = plan.get('route')
     if not route:
-        route = [{'type': 'stop', 'city': s['name'].split(',')[0], 'nights': s.get('tab_sub', ''), 'color': s.get('color')} for s in stops]
+        route = [{'type': 'stop', 'city': s['name'].split(',')[0], 'nights': first_val(s.get('tab_sub', '')), 'color': s.get('color')} for s in stops]
     rs = []
     for r in route:
-        t = r.get('type')
+        t = r.get('type'); n0 = len(rs)
         if t == 'home':
             rs.append(f'<div class="route-home"><div class="rn-city">{esc(r["city"])}</div><div class="rn-nights mono">{esc(r.get("sub", "Home"))}</div></div>')
         elif t == 'fly':
@@ -536,6 +587,8 @@ def render(plan, base):
             rs.append(f'<div class="route-via"><div class="rv-label mono">{esc(r["label"])}</div><div class="rv-mode">{esc(r.get("mode", "DRIVE"))}</div></div>')
         else:
             rs.append(f'<div class="route-node"><div class="rn-dot" style="background:var(--{color(r.get("color"))})"></div><div class="rn-city">{esc(r["city"])}</div><div class="rn-nights mono">{esc(r.get("nights", ""))}</div></div>')
+        if swap_tags(r):
+            rs[-1] = rs[-1].replace('<div class="', '<div' + sw_attr(r) + ' class="', 1)
     # overview
     rows = []
     for si, st in enumerate(stops):
@@ -574,11 +627,12 @@ def render(plan, base):
     overview = (f'<section class="panel" id="p-overview">{banner}<div class="ov-grid"><div><h3 class="blk-h">The trip, day by day</h3><p class="blk-sub">Tap a row to open that stop.</p>{ov_swaps}{glance}</div>'
                 f'<aside class="p-side">{todo}</aside></div>{weather(w) if w else ""}'
                 f'{section(r.get("tag", "Risks"), r["title"], r.get("intro", ""), r["cards"], sid="risks") if r else ""}{src_html}'
-                f'<a class="p-next" href="#top"><label for="t-{tabs[1][0]}">Start: {esc(tabs[1][1])} &rarr;</label></a></section>')
+                f'{start_links(plan, tabs, order_groups, tab_name)}</section>')
     panels = [overview]
     for i, st in enumerate(stops, 1):
         nxt = (tabs[i + 1][0], tabs[i + 1][1]) if i + 1 < len(tabs) else None
-        panels.append(stop_panel(st, i, nxt, base, plan))
+        nxh = next_links(plan, slug(st['id']), tabs, order_groups, tab_name, [slug(e['id']) for e in extras]) if order_groups else None
+        panels.append(stop_panel(st, i, nxt, base, plan, nxh, numbered=not order_groups))
     for j, ex in enumerate(extras):
         k = len(stops) + 1 + j
         nxt = f'<a class="p-next" href="#top"><label for="t-{tabs[k + 1][0]}">Next: {esc(tabs[k + 1][1])} &rarr;</label></a>' if k + 1 < len(tabs) else ''
@@ -591,10 +645,14 @@ def render(plan, base):
             radios += f'<input type="radio" name="sw-{gid}" class="swradio" id="sw-{gid}-{slug(o["id"])}"{" checked" if n == 0 else ""}>'
             for o2 in g['options']:
                 if o2 is not o:
-                    swcss += f'#sw-{gid}-{slug(o["id"])}:checked ~ .panels [data-sw~="{g["id"]}:{o2["id"]}"]{{display:none}}'
+                    for scope in ('.route-strip', '.tabbar', '.panels'):
+                        swcss += f'#sw-{gid}-{slug(o["id"])}:checked ~ {scope} [data-sw~="{g["id"]}:{o2["id"]}"]{{display:none}}'
+            if 'tabs' in o:
+                for pos, tk in enumerate([slug(x) for x in o['tabs']] + [slug(e['id']) for e in extras], 1):
+                    swcss += f'#sw-{gid}-{slug(o["id"])}:checked ~ .tabbar label[for=t-{tk}]{{order:{pos}}}'
             swcss += f'#sw-{gid}-{slug(o["id"])}:checked ~ .panels .swap-opt[for=sw-{gid}-{slug(o["id"])}]{{background:var(--paper-raised);border-color:var(--ink);box-shadow:inset 0 -3px 0 var(--ink)}}'
     bar = '<span id="top" class="tabs-anchor"></span><nav class="tabbar" aria-label="Sections">' + ''.join(
-        f'<label for="t-{k}" style="--c:var(--{c if c != "ink" else "ink"})"><span class="tb-name">{esc(n)}</span><span class="tb-sub mono">{esc(s)}</span></label>' for k, n, c, s in tabs) + '</nav>'
+        f'<label for="t-{k}" style="--c:var(--{c if c != "ink" else "ink"})"><span class="tb-name">{esc(n)}</span>{sw_val(s, "tb-sub mono", "span")}</label>' for k, n, c, s in tabs) + '</nav>'
     tabcss = ''.join(f'#t-{k}:checked ~ .panels #p-{k}{{display:block}}#t-{k}:checked ~ .tabbar label[for=t-{k}]{{background:var(--paper-raised);border-color:var(--c);box-shadow:inset 0 -3px 0 var(--c)}}' for k, _, _, _ in tabs)
     tabcss += swcss
     ncol = len(tabs)
@@ -605,8 +663,8 @@ def render(plan, base):
                  f'<div class="hero-content"><div class="hero-eyebrow">{eyebrow}</div><h1>{esc(plan["headline"])}</h1>{lede}</div></div>')
     css = open(os.path.join(TPL, 'fonts.css')).read() + open(os.path.join(TPL, 'guide.css')).read() + tabcss
     return (f'<!doctype html>\n<html lang="{esc(plan.get("lang", "en"))}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-            f'<title>{esc(plan["title"])}</title><style>{css}</style></head><body><div class="page">{hero_html}<div class="route-strip">{"".join(rs)}</div>'
-            f'{radios}{bar}<div class="panels">{"".join(panels)}</div>{foot}'
+            f'<title>{esc(plan["title"])}</title><style>{css}</style></head><body><div class="page">{hero_html}{radios}<div class="route-strip">{"".join(rs)}</div>'
+            f'{bar}<div class="panels">{"".join(panels)}</div>{foot}'
             f'<p class="hero-credit" style="font-size:11px;color:var(--ink-faint);margin:18px 0 0">Cover photo: {esc(hero["credit"])}</p></div></body></html>')
 
 

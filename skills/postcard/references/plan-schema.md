@@ -73,15 +73,22 @@ Entities such as `&ndash;` and `&amp;` are kept as written. Everything else is e
 
 ## Swaps
 
-A swap lets the reader pick a version of part of the plan. The first option is the default.
+A swap lets the reader pick between whole versions of the trip. The first option is the default. The usual use is the order of the middle stops.
 
 ```json
-"swaps": [{"id": "route", "label": "Monday night to Tuesday", "options": [
-  {"id": "east", "name": "East: Tacoma and the outlets", "note": "Point Defiance, outlets"},
-  {"id": "west", "name": "West: Hoh and the coast", "note": "Mosses, Ruby Beach"}]}]
+"swaps": [{"id": "order", "label": "Order of the two big blocks", "options": [
+  {"id": "olympic-first", "name": "Olympic, then Rainier", "note": "Starts with the lavender festival",
+   "tabs": ["olympic", "rainier", "seattle"]},
+  {"id": "rainier-first", "name": "Rainier, then Olympic", "note": "Misses the festival",
+   "tabs": ["rainier", "olympic", "seattle"]}]}]
 ```
 
-Tag each day or stay in a version with `"swap": "route:east"` (a list tags several groups). Untagged days always show. Each option shows its total driving, summed from `drive_h` on the days it tags. The calendar file uses the default versions only.
+- **`tabs`** (optional) lists every stop id once, in that order. It reorders the tabs, the "Next" links and the Start link.
+- **`swap`** on a day, stay or route item: `"order:rainier-first"` (a list tags several groups). Untagged items always show.
+- **`dates` and `tab_sub`** of a stop can be a string, or an object keyed by tag: `{"order:olympic-first": "Sat to Mon", "order:rainier-first": "Tue to Fri"}`.
+- **`route`** nodes take `swap` too, so the strip shows the route for the chosen order. Author both routes.
+- Each option shows its total driving, summed from `drive_h` on the days it tags. The calendar file uses the first option only.
+- Stop numbers ("Stop 1") are left off when an order can change.
 
 ## Word budgets
 

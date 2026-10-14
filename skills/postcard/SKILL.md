@@ -26,14 +26,14 @@ Report each stage with `progress.py step <pct> "<stage>"`.
 1. **5, Planning the route.** Stops, nights and order. Save a first `plan.json` with `"stage": "planned"`.
 2. **15, Researching.** Read `references/research.md` and follow it. Every price, hour, closure and date goes into `sources`. Set `"stage": "researched"`.
 3. **35, Finding photos.** Read `references/photos.md`. Photos go in `<trip>/photos/`. **50, Checking photos:** look at the contact sheet.
-4. **70, Writing the plan.** Read `references/plan-rules.md`, then fill in `plan.json` using `references/plan-schema.md`. Keep it lean and add swaps where a stretch has real alternatives. Run `render_guide.py plan.json --check`, fix what it flags, then `render_guide.py plan.json`. Never hand-write the HTML.
+4. **70, Writing the plan.** Read `references/plan-rules.md`, then fill in `plan.json` using `references/plan-schema.md`. Keep it lean. If two stops could swap places, add a block swap. Run `render_guide.py plan.json --check`, fix what it flags, then `render_guide.py plan.json`. Never hand-write the HTML.
 5. **85, Checking.** Run `validate_guide.py <guide>.html --plan plan.json`. Fix every error and read every warning. Repeat until it passes.
 6. **92, Fact-check pass.** Re-read the finished text and re-verify every claim (the checklist is in `research.md`). Fix the plan, re-render, re-validate. Then set `verification.second_pass` to true and `status` to `verified`. If you cannot verify, leave `status` as `partial` and say what is missing.
 7. **Done.** `progress.py done "<guide.html>"`. Run `serve.py stop` when the user is finished. If you cannot finish, run `progress.py fail "<reason>"`.
 
 ## 3. Changing a guide
 
-Open `<trip>/plan.json`, edit it, re-render, re-validate. New facts still need sources and a re-check. To add an alternative, add a `swaps` group and tag the days and stays that change. A plan written before version 3 needs `"depth": "full"` to render. A guide without a `plan.json` is an older one: see `references/layout.md` for editing HTML safely.
+Open `<trip>/plan.json`, edit it, re-render, re-validate. New facts still need sources and a re-check. To let the reader reorder or replace whole stops, add a `swaps` group and tag the days and stays in each order. A plan written before version 3 needs `"depth": "full"` to render. A guide without a `plan.json` is an older one: see `references/layout.md` for editing HTML safely.
 
 ## 4. Rules
 

@@ -18,14 +18,15 @@ The guide is a plan, not an essay. The renderer enforces the budgets in `referen
 
 ## Swaps
 
-A swap is a part of the plan with two or three real versions. The reader picks one at the top of the Overview, and every tab follows.
+A swap lets the reader move whole blocks of the trip. A block is a stop: Olympic, Rainier, Seattle. The reader picks an order at the top of the Overview, and the tabs, dates, route and day plans follow.
 
-- **Build both, then let the reader choose.** Do not ask. When the user doubts a stretch ("the Hoh is far", "is anything worth a stop on the way?"), turn it into a swap.
-- **The version the user asked for goes first.** It is the default and the one in the calendar file.
-- **Two groups at most, three options at most.** More is a menu, not a plan.
-- **Tag everything that changes.** Each day and each stay in a version carries `"swap": "group:option"`. Days that do not change carry no tag.
-- **Each option gets a name and a note** of up to 14 words saying what it gives. The renderer adds the driving hours from `drive_h`.
-- **Tell the trade once**, in the note. Then plan the version properly. Do not argue against a pick.
+- **Swap blocks, not days.** Reorder two stops, or put one stop in place of another. Never swap single days or single meals. That is too fine to be useful.
+- **Fixed ends stay fixed.** The arrival flight and the departure flight pin the first and last stop. Only the middle blocks move.
+- **Write each order out.** Tag every day and stay in an order with `"swap": "order:<option>"`. Give each stop a `dates` (and `tab_sub`) for each order. Give each option a `tabs` list with the stop ids in that order.
+- **The order the user asked for goes first.** It is the default and the one in the calendar file.
+- **Say what each order costs in the note**, up to 14 words: a fixed-date event it misses, a booking that moves. The renderer adds the driving hours from `drive_h`.
+- **Two orders is usually enough.** Three options at most.
+- **Do not ask which order.** Build both when the user doubts the order, and let them choose.
 
 ## Driving and days
 

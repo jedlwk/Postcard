@@ -84,7 +84,7 @@ Start a new Codex session and type `$postcard`. In the ChatGPT app, type `@` and
 
 **Honest about what it checked.** A guide that was not fully fact-checked says so at the top. A verified one lists its sources.
 
-**Swaps.** Where a stretch has two or three real ways to do it, the guide holds all of them. Pick a version at the top of the Overview and every tab follows. Each version shows its driving hours.
+**Move the blocks.** Each stop is a block. If two of them can swap places, pick the order at the top of the Overview. The tabs, dates, route and day plans follow, and each order shows its driving hours.
 
 **Short on purpose.** A day is a one-line lead and up to four bullets. Ask for more detail and the guide gets longer.
 

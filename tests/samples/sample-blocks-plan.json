@@ -1,0 +1,236 @@
+{
+ "title": "Sample block guide",
+ "headline": "Three blocks, two orders.",
+ "eyebrow": "TEST DATA &middot; NOT TRAVEL ADVICE",
+ "lede": "Pick the order of the first two blocks. **None of the facts are real.**",
+ "start": "2027-10-08",
+ "end": "2027-10-13",
+ "hero": {
+  "image": "photos/hero.jpg",
+  "alt": "Test image",
+  "credit": "Generated test image, public domain"
+ },
+ "verification": {
+  "status": "unchecked"
+ },
+ "swaps": [
+  {
+   "id": "order",
+   "label": "Order of the first two blocks",
+   "options": [
+    {
+     "id": "abc",
+     "name": "A, then B",
+     "note": "Starts with the festival",
+     "tabs": [
+      "stop-a",
+      "stop-b",
+      "stop-c"
+     ]
+    },
+    {
+     "id": "bac",
+     "name": "B, then A",
+     "note": "Misses the festival",
+     "tabs": [
+      "stop-b",
+      "stop-a",
+      "stop-c"
+     ]
+    }
+   ]
+  }
+ ],
+ "route": [
+  {
+   "type": "home",
+   "city": "Home"
+  },
+  {
+   "type": "stop",
+   "city": "Stop A",
+   "nights": "2 nights",
+   "color": "s1",
+   "swap": "order:abc"
+  },
+  {
+   "type": "drive",
+   "label": "1 h",
+   "swap": "order:abc"
+  },
+  {
+   "type": "stop",
+   "city": "Stop B",
+   "nights": "2 nights",
+   "color": "s2",
+   "swap": "order:abc"
+  },
+  {
+   "type": "stop",
+   "city": "Stop B",
+   "nights": "2 nights",
+   "color": "s2",
+   "swap": "order:bac"
+  },
+  {
+   "type": "drive",
+   "label": "1 h",
+   "swap": "order:bac"
+  },
+  {
+   "type": "stop",
+   "city": "Stop A",
+   "nights": "2 nights",
+   "color": "s1",
+   "swap": "order:bac"
+  },
+  {
+   "type": "drive",
+   "label": "2 h"
+  },
+  {
+   "type": "stop",
+   "city": "Stop C",
+   "nights": "1 night",
+   "color": "s3"
+  }
+ ],
+ "stops": [
+  {
+   "id": "stop-a",
+   "name": "Stop A",
+   "tab": "Stop A",
+   "tab_sub": "2 nights",
+   "color": "s1",
+   "sleep": "A town",
+   "dates": {
+    "order:abc": "Fri&ndash;Sun, Oct 8&ndash;10, 2027 &middot; 2 nights",
+    "order:bac": "Tue&ndash;Thu, Oct 11&ndash;13, 2027 &middot; 2 nights"
+   },
+   "photos": [
+    {
+     "file": "photos/a1.jpg",
+     "what": "A test photo",
+     "where": "Somewhere",
+     "credit": "Test image"
+    }
+   ],
+   "days": [
+    {
+     "date": "2027-10-08",
+     "cat": "Festival",
+     "lead": "The festival day.",
+     "drive_h": 1,
+     "swap": "order:abc",
+     "bullets": [
+      "Open 09:00 to 19:00."
+     ]
+    },
+    {
+     "date": "2027-10-09",
+     "cat": "Nature",
+     "lead": "A walk.",
+     "swap": "order:abc"
+    },
+    {
+     "date": "2027-10-11",
+     "cat": "Nature",
+     "lead": "A walk, no festival.",
+     "drive_h": 1,
+     "swap": "order:bac"
+    },
+    {
+     "date": "2027-10-12",
+     "cat": "Nature",
+     "lead": "A second walk.",
+     "swap": "order:bac"
+    }
+   ],
+   "stays": [
+    {
+     "nights": "2 nights",
+     "base": "A town",
+     "why": "Quiet."
+    }
+   ]
+  },
+  {
+   "id": "stop-b",
+   "name": "Stop B",
+   "tab": "Stop B",
+   "tab_sub": "2 nights",
+   "color": "s2",
+   "sleep": "B town",
+   "dates": {
+    "order:abc": "Sun&ndash;Tue, Oct 10&ndash;12, 2027 &middot; 2 nights",
+    "order:bac": "Fri&ndash;Sun, Oct 8&ndash;10, 2027 &middot; 2 nights"
+   },
+   "photos": [
+    {
+     "file": "photos/b1.jpg",
+     "what": "Test photo",
+     "where": "Hill",
+     "credit": "Test image"
+    }
+   ],
+   "days": [
+    {
+     "date": "2027-10-10",
+     "cat": "Scenic",
+     "lead": "Up the hill.",
+     "drive_h": 2,
+     "swap": "order:abc"
+    },
+    {
+     "date": "2027-10-11",
+     "cat": "Scenic",
+     "lead": "The viewpoint.",
+     "swap": "order:abc"
+    },
+    {
+     "date": "2027-10-08",
+     "cat": "Scenic",
+     "lead": "Up the hill first.",
+     "drive_h": 2,
+     "swap": "order:bac"
+    },
+    {
+     "date": "2027-10-09",
+     "cat": "Scenic",
+     "lead": "The viewpoint.",
+     "swap": "order:bac"
+    }
+   ]
+  },
+  {
+   "id": "stop-c",
+   "name": "Stop C",
+   "tab": "Stop C",
+   "tab_sub": "1 night",
+   "color": "s3",
+   "sleep": "C city",
+   "dates": "Wed&ndash;Thu, Oct 13&ndash;14, 2027 &middot; 1 night",
+   "photos": [
+    {
+     "file": "photos/b2.jpg",
+     "what": "Test photo 2",
+     "where": "City",
+     "credit": "Test image"
+    }
+   ],
+   "days": [
+    {
+     "date": "2027-10-12",
+     "cat": "Travel",
+     "lead": "Arrive in the city.",
+     "drive_h": 2
+    },
+    {
+     "date": "2027-10-13",
+     "cat": "Travel",
+     "lead": "Fly home."
+    }
+   ]
+  }
+ ]
+}

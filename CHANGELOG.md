@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.0
+
+- Swaps now work on whole stops. Pick the order of the big blocks (say Olympic then Rainier, or the reverse) and the tabs, dates, route strip, day table and Next links all follow.
+- Stops can have dates and nights for each order, and route nodes can be tagged.
+- The first example now swaps Olympic and Rainier.
+- `references/plan-rules.md` says to swap blocks, not single days.
+
 ## 3.0.6
 
 - The example preview shows the guide at desktop width, scaled to fit the panel, so it keeps its full layout instead of reflowing like a phone page.
