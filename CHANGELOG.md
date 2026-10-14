@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.1
+
+- All seven example previews are rebuilt in the short format, with mixed day tags and driving hours.
+
 ## 3.2.0
 
 - A fourth lever in the form: Budget (tight to splurge).
