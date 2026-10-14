@@ -61,7 +61,7 @@ Entities such as `&ndash;` and `&amp;` are kept as written. Everything else is e
 | `alert` | `label`, `text`: a risk that lands on these dates |
 | `photos` | each: `file`, `what`, `where`, `credit` |
 | `map` | `file`, `caption`, `credit`, `source_url` (a real published map) |
-| `days` | each: `date` (ISO), `cat` (Arrival, Travel, Food, Nature, Culture, Festival, Scenic), `lead`, `bullets`, optional `drive_h` (hours), `sleep`, `swap` |
+| `days` | each: `date` (ISO), `cat` (one or up to three of Arrival, Travel, Food, Nature, Culture, Festival, Scenic, Market, as a string or a list: a day is often a mix), `lead`, `bullets`, optional `drive_h` (hours), `sleep`, `swap` |
 | `stays` | each: `nights`, `base`, `why`, `pick` (`name`, `text`, optional `tag`), `alts` (`label`, `text`), `links`, optional `swap` |
 | `know`, `cards` | plain lists for the side column (`cards` have a `title`) |
 | `festivals` | each: `tag` (`high`, `likely`, `uncertain`, `risk`), `text` |

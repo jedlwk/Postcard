@@ -190,6 +190,8 @@ def check_plan(plan, base):
             except Exception:
                 errs.append(f'{w}: day has a bad date: {d.get("date")}')
             need(d.get('lead'), f'{w}: day {d.get("date")} needs a lead line')
+            if not isinstance(d.get('cat', ''), str) and len(d['cat']) > 3:
+                errs.append(f'{w}: day {d.get("date")} has more than 3 categories')
     h = plan.get('hero') or {}
     need(h.get('image'), 'hero.image is required')
     if h.get('image') and not os.path.isfile(h['image'] if os.path.isabs(h['image']) else os.path.join(base, h['image'])):
@@ -382,10 +384,12 @@ def swap_bar(plan, only=None):
 
 def day_item(d):
     dd = pdate(d['date'])
-    cat = DAY_CAT.get(str(d.get('cat', 'nature')).lower(), 'nature')
+    cats = d.get('cat') or 'Nature'
+    cats = [cats] if isinstance(cats, str) else list(cats)
+    tags = ''.join(f'<span class="day-cat" style="background:var(--cat-{DAY_CAT.get(str(x).lower(), "nature")}-tint); color:var(--cat-{DAY_CAT.get(str(x).lower(), "nature")})">{esc(x)}</span>' for x in cats)
     bullets = f'<ul class="day-highlights">{li(d.get("bullets", []))}</ul>' if d.get('bullets') else ''
     drive = f'<span class="day-drive mono">{fmt_h(d["drive_h"])} driving</span>' if d.get('drive_h') else ''
-    return (f'<div class="day-item"{sw_attr(d)}><div class="day-tag"><span class="mono">{dlabel(dd)}</span><span class="day-cat" style="background:var(--cat-{cat}-tint); color:var(--cat-{cat})">{esc(d.get("cat", ""))}</span>{drive}</div>'
+    return (f'<div class="day-item"{sw_attr(d)}><div class="day-tag"><span class="mono">{dlabel(dd)}</span>{tags}{drive}</div>'
             f'<div class="day-text"><span class="day-lead">{md(d["lead"])}</span>{bullets}</div></div>')
 
 

@@ -19,7 +19,7 @@
      "photos": [{"file": "photos/a1.jpg", "what": "A test photo", "where": "Somewhere", "credit": "Test image"}],
      "days": [
        {"date": "2027-10-08", "cat": "Arrival", "lead": "Land at **12:00** and walk the old town.", "bullets": ["Check in after 14:00"], "drive_h": 1},
-       {"date": "2027-10-09", "cat": "Nature", "lead": "Beaches and a long lunch.", "bullets": ["Low tide is at 09:00 {must}"], "drive_h": 2, "swap": "mid:coast"},
+       {"date": "2027-10-09", "cat": ["Nature", "Food"], "lead": "Beaches and a long lunch.", "bullets": ["Low tide is at 09:00 {must}"], "drive_h": 2, "swap": "mid:coast"},
        {"date": "2027-10-09", "cat": "Nature", "lead": "Up the hill before the crowds.", "bullets": ["Start by 07:00"], "drive_h": 3.5, "swap": "mid:hills"},
        {"date": "2027-10-10", "cat": "Travel", "lead": "Slow morning, then on to Stop B.", "drive_h": 1.5, "sleep": "Hill town"}],
      "stays": [

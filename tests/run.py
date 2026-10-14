@@ -220,7 +220,7 @@ class ExampleTests(unittest.TestCase):
 
     def test_presets_are_complete(self):
         names, styles = self.keys
-        self.assertEqual(len(names), 6); self.assertEqual(len(styles), 3)
+        self.assertEqual(len(names), 6); self.assertEqual(len(styles), 4)
         for e in self.ex:
             self.assertGreater(len(e['trip']), 400, e['k'] + ': prompt should be detailed')
             self.assertLess(e['fin'][0], e['fout'][0], e['k'])
@@ -302,6 +302,8 @@ class RenderTests(Base):
         self.assertIn('data-sw="mid:hills"', page)
         self.assertIn('2h00 driving', page); self.assertIn('3h30 driving', page)               # per day and per option
         self.assertNotIn('<script', page)
+        self.assertEqual(page.count('class="day-cat"'), 7)                                       # a day can carry two tags
+        self.assertIn('>Food</span>', page)
 
     def test_calendar_uses_default_swap_only(self):
         self.lean(); self.render_lean = py(os.path.join(SC, 'render_guide.py'), self.plan_path, env=self.env)

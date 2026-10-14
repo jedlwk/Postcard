@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.2.0
+
+- A fourth lever in the form: Budget (tight to splurge).
+- A day can carry up to three category tags, such as Nature and Food, instead of one.
+
 ## 3.1.0
 
 - Swaps now work on whole stops. Pick the order of the big blocks (say Olympic then Rainier, or the reverse) and the tabs, dates, route strip, day table and Next links all follow.
