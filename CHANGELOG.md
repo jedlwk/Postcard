@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.6
+
+- The example preview shows the guide at desktop width, scaled to fit the panel, so it keeps its full layout instead of reflowing like a phone page.
+
 ## 3.0.5
 
 - The example preview now takes half the page (50%).

@@ -367,7 +367,8 @@ details.sent pre{white-space:pre-wrap;font:12.5px/1.55 ui-monospace,SFMono-Regul
 .peek-bar a{color:var(--accent);text-decoration:none;font-weight:560;white-space:nowrap}
 .peek-bar a:hover{text-decoration:underline}
 .peek-view{position:relative;flex:1;min-height:0;background:#f1efe7}
-.peek-view iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#f1efe7}
+.peek-view{overflow:hidden;--s:.6}
+.peek-view iframe{position:absolute;left:0;top:0;width:1100px;height:calc(100% / var(--s));border:0;background:#f1efe7;transform:scale(var(--s));transform-origin:0 0}
 .peek-load{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:#8a8478;background:#f1efe7;pointer-events:none;transition:opacity .3s}
 .peek-load.done{opacity:0}
 .peek-cap{margin:0;font-size:12.5px;color:var(--faint);line-height:1.5}
@@ -559,6 +560,8 @@ function setPeek(e) {
 }
 $('#peekFrame').addEventListener('load', () => { if ($('#peekFrame').getAttribute('src')) $('#peekLoad').classList.add('done'); });
 setPeek(EXAMPLES[0]);
+const peekFit = () => { const v = document.querySelector('.peek-view'); if (v && v.clientWidth) v.style.setProperty('--s', (v.clientWidth / 1100).toFixed(4)); };
+if (window.ResizeObserver) new ResizeObserver(peekFit).observe(document.querySelector('.peek-view')); peekFit();
 document.querySelectorAll('.ex').forEach(b => b.onclick = () => { const e = EXAMPLES[+b.dataset.i]; applyExample(e); setPeek(e); });
 const exs = $('#exs'); const step = () => exs.querySelector('.ex').offsetWidth + 14;
 $('#exPrev').onclick = () => exs.scrollBy({left: -step(), behavior: 'smooth'});
